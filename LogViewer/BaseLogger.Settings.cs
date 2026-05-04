@@ -42,7 +42,7 @@ namespace LogViewer
         private static string _defaultLogDisplayFormat = LogDisplayFormatFallback;
 
         private static readonly object _excludeCharsLock = new();
-        private static IReadOnlyCollection<char> _excludeCharsFromHandle = ['.', '-'];
+        private static IReadOnlyCollection<char> _excludeCharsFromHandle = ['.', '-', ' '];
         private static HashSet<char> _excludeCharsSet = new(['.', '-', ' ']);
 
         /// <summary>
@@ -165,7 +165,9 @@ namespace LogViewer
         public static bool IncludeTimestampInOutput { get; set; } = true;
         /// <summary>
         /// Gets or sets the collection of characters to exclude from handle generation.
-        /// When set, rebuilds the internal HashSet for efficient lookup.
+        /// When set, rebuilds the internal HashSet for efficient lookup. Defaults to
+        /// <c>['.', '-', ' ']</c>; assign a different collection (including an empty
+        /// one) to change which characters are stripped.
         /// </summary>
         public static IReadOnlyCollection<char> ExcludeCharsFromHandle
         {
@@ -181,8 +183,7 @@ namespace LogViewer
                 lock (_excludeCharsLock)
                 {
                     _excludeCharsFromHandle = value ?? [];
-                    // Rebuild HashSet with space always included
-                    _excludeCharsSet = [.. _excludeCharsFromHandle, ' '];
+                    _excludeCharsSet = [.. _excludeCharsFromHandle];
                 }
             }
         }

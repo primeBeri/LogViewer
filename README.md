@@ -1,6 +1,6 @@
 # LogViewer (RealTimeLogStream)
 
-**Version:** 0.2.0 | **Framework:** .NET 8.0 Windows | **License:** MIT
+**Version:** 0.3.0 | **Framework:** .NET 8.0 Windows | **License:** MIT
 
 A real-time log viewer control for .NET 8 WPF applications. LogViewer integrates seamlessly with `Microsoft.Extensions.Logging` to display structured, color-coded, filterable logs in your application's UI.
 
@@ -33,7 +33,7 @@ dotnet add package RealTimeLogStream --source https://nuget.pkg.github.com/Arise
 Or add to your `.csproj`:
 
 ```xml
-<PackageReference Include="RealTimeLogStream" Version="0.2.0" />
+<PackageReference Include="RealTimeLogStream" Version="0.3.0" />
 ```
 
 ### Project Reference
@@ -167,7 +167,7 @@ That's it! Logs will appear in the LogControl in real time.
 
 ## Custom Display Format
 
-Customize how log entries are displayed using format placeholders:
+Customize how log entries are displayed using format placeholders. Placeholder names are case-insensitive (`{Timestamp}`, `{TIMESTAMP}`, and `{timestamp}` all match); literal text in the format string preserves its original casing.
 
 | Placeholder | Description |
 |-------------|-------------|
@@ -214,6 +214,8 @@ Wildcards are automatically converted to regex:
 string regex = LogControlViewModel.WildcardToRegex("*Error*");
 logControl.HandleFilter = regex;
 ```
+
+> **Note:** Invalid regex patterns (syntax errors) and patterns that use features unsupported by `RegexOptions.NonBacktracking` (backreferences, lookarounds, atomic groups) are silently rejected — the filter retains its previous valid value rather than throwing.
 
 ---
 
@@ -303,13 +305,15 @@ LogViewer is designed for multi-threaded applications:
 | Type | Description |
 |------|-------------|
 | `LogControl` | WPF UserControl for displaying logs |
-| `LogControlViewModel` | ViewModel for log operations |
+| `LogControlViewModel` | ViewModel for log operations. `LogEvents` is exposed as `ReadOnlyLogCollection`. |
 | `BaseLoggerProvider` | `ILoggerProvider` implementation |
 | `BaseLogger` | `ILogger` implementation |
 | `IBaseLoggerSink` | Interface for log event routing |
 | `BaseLoggerSink` | Default singleton sink |
 | `LogEventArgs` | Log event data container |
-| `LogCollection` | Thread-safe observable collection |
+| `LogCollection` | Thread-safe observable collection (mutable; used internally by the VM) |
+| `ReadOnlyLogCollection` | Read-only public view over a `LogCollection`. Forwards change events for binding; preserves WPF `ListView` virtualization. |
+| `BatchNotificationMode` | Controls how `LogCollection.AddRange`/`RemoveRange` raise events: `Reset` (default, WPF-safe), `Atomic` (single multi-item event for reactive consumers), `PerItem` (`ObservableCollection` semantics). |
 
 ### Extension Methods
 
@@ -335,6 +339,26 @@ See the `LogViewerExample` project for a complete working example demonstrating:
 - Integration with NLog
 - Continuous log generation for testing
 - Exception logging
+
+---
+
+## Upgrading from 0.2.x to 0.3.0
+
+0.3.0 is a focused correctness release. Most consumers can upgrade without code changes. Breaking changes:
+
+- **`LogControlViewModel.LogEvents`** is now typed as `ReadOnlyLogCollection` instead of `LogCollection`. Code that mutated this collection directly (`Add`, `Clear`, `Remove`, etc.) will fail to compile. Mutation was never the consumer's responsibility — the VM owns the collection — but the type now enforces it. Bind to it the same way you did before; the read-only view forwards `INotifyCollectionChanged`/`INotifyPropertyChanged` and implements `IList`/`IReadOnlyList<T>` for WPF virtualization.
+- **`LogControl` dependency-property setters** no longer execute side-effect logic in CLR setters. Validation, coercion, and template rebuilds now run from property metadata callbacks, so XAML, bindings, animations, and code paths all behave identically. If you were relying on CLR-setter side effects (e.g., subclassing and overriding the setters), revisit the property-changed callbacks instead.
+- **`SetRegexFilterIfValid`** now also catches `NotSupportedException` (raised by `RegexOptions.NonBacktracking` on patterns that use backreferences/lookarounds). Patterns that previously crashed the app are now silently rejected.
+- **`LogCollection.AddRange`/`RemoveRange`** default to a single `Reset` notification per batch instead of a multi-item `Add`/`Remove`. WPF `CollectionView` consumers stop hitting `NotSupportedException("Range actions are not supported")`. To restore the old behavior, set `LogCollection.NotificationMode = BatchNotificationMode.Atomic`. For `ObservableCollection`-style per-item events, use `BatchNotificationMode.PerItem`.
+- **`BaseLogger.ExcludeCharsFromHandle`** no longer silently appends `' '` to the user's input. The default value (`['.', '-', ' ']`) is unchanged in behavior, but the property now round-trips honestly: what you set is what gets used.
+
+Internal correctness improvements (no consumer impact):
+- `LogEventArgs.FormatLogMessage` no longer lower-cases the entire format string.
+- CSV export no longer double-quotes message fields.
+- `BaseLogger.Log<TState>` now passes the actual `Exception` to the formatter.
+- `BaseLoggerProvider.CreateLogger` is now contention-safe (uses `Lazy<T>`).
+- `LogControlViewModel.IsPaused`/`ResumeAndFlushLogs` no longer hold `_pauseLock` across UI dispatches.
+- Combined add+trim into a single dispatched callback per log event.
 
 ---
 

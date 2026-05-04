@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using Microsoft.Extensions.Logging;
@@ -107,16 +108,22 @@ namespace LogViewer
         {
             if (string.IsNullOrWhiteSpace(format)) format = BaseLogger.LogExportFormat;
 
-            var sb = new StringBuilder(format.ToLower(CultureInfo.InvariantCulture))
-                .Replace("{timestamp}", LogDateTimeFormatted)
-                .Replace("{loglevel}", LogLevel.ToString())
-                .Replace("{threadid}", ThreadId.ToString(CultureInfo.InvariantCulture))
-                .Replace("{color}", LogColor.ToString(System.Globalization.CultureInfo.InvariantCulture))
-                .Replace("{handle}", LogHandle)
-                .Replace("{message}", LogText);
-
-            return sb.ToString();
+            return PlaceholderRegex.Replace(format, match => match.Groups[1].Value.ToLowerInvariant() switch
+            {
+                "timestamp" => LogDateTimeFormatted,
+                "loglevel"  => LogLevel.ToString(),
+                "threadid"  => ThreadId.ToString(CultureInfo.InvariantCulture),
+                "color"     => LogColor.ToString(CultureInfo.InvariantCulture),
+                "handle"    => LogHandle,
+                "message"   => LogText,
+                _           => match.Value
+            });
         }
+
+        private static readonly Regex PlaceholderRegex = new(
+            @"\{(timestamp|loglevel|threadid|color|handle|message)\}",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled,
+            TimeSpan.FromMilliseconds(100));
 
         /// <summary>
         /// Determines whether the specified <see cref="LogEventArgs"/> is equal to the current instance using reference equality.

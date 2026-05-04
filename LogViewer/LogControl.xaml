@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:LogViewer"
              xmlns:converters="clr-namespace:LogViewer.Converters"
              mc:Ignorable="d"
-             d:DesignHeight="500" d:DesignWidth="1200" Unloaded="LogViewer_Unloaded"
+             d:DesignHeight="500" d:DesignWidth="1200"
              d:DataContext="{d:DesignInstance Type=local:LogControlViewModel}">
     <UserControl.Resources>
         <ResourceDictionary>

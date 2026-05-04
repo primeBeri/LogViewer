@@ -15,7 +15,7 @@ namespace LogViewer
     /// <param name="innerFactory">Optional inner factory to pass through log calls to.</param>
     public sealed class BaseLoggerProvider(IBaseLoggerSink sink, ILoggerFactory? innerFactory = null) : ILoggerProvider
     {
-        private readonly ConcurrentDictionary<string, BaseLogger> _loggers = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, Lazy<BaseLogger>> _loggers = new(StringComparer.OrdinalIgnoreCase);
         private readonly ConcurrentDictionary<string, Color> _categoryColors = new(StringComparer.OrdinalIgnoreCase);
         private readonly IBaseLoggerSink _sink = sink ?? throw new ArgumentNullException(nameof(sink));
         private readonly ILoggerFactory? _innerFactory = innerFactory;
@@ -51,24 +51,30 @@ namespace LogViewer
         /// <inheritdoc />
         public ILogger CreateLogger(string categoryName)
         {
+            // Wrap construction in Lazy<T> so the expensive work (especially
+            // _innerFactory.CreateLogger, which can have side effects in NLog/
+            // Serilog/custom factories) happens exactly once per category, even
+            // if GetOrAdd's factory delegate runs multiple times under contention.
             return _loggers.GetOrAdd(categoryName, name =>
-            {
-                var typeName = name;
-                if (StripNamespaceFromCategory)
+                new Lazy<BaseLogger>(() =>
                 {
-                    // Extract just the type name if this is a fully-qualified name (e.g., "Namespace.TypeName" -> "TypeName")
-                    var lastDotIndex = name.LastIndexOf('.');
-                    if (lastDotIndex >= 0 && lastDotIndex < name.Length - 1)
+                    var typeName = name;
+                    if (StripNamespaceFromCategory)
                     {
-                        typeName = name[(lastDotIndex + 1)..];
+                        // Extract just the type name if this is a fully-qualified name (e.g., "Namespace.TypeName" -> "TypeName")
+                        var lastDotIndex = name.LastIndexOf('.');
+                        if (lastDotIndex >= 0 && lastDotIndex < name.Length - 1)
+                        {
+                            typeName = name[(lastDotIndex + 1)..];
+                        }
                     }
-                }
 
-                var sanitizedName = BaseLogger.SanitizeHandle(typeName);
-                var color = _categoryColors.TryGetValue(sanitizedName, out var c) ? c : Colors.Black;
-                var innerLogger = _innerFactory?.CreateLogger(name);
-                return new BaseLogger(sanitizedName, color, _sink, innerLogger, this);
-            });
+                    var sanitizedName = BaseLogger.SanitizeHandle(typeName);
+                    var color = _categoryColors.TryGetValue(sanitizedName, out var c) ? c : Colors.Black;
+                    var innerLogger = _innerFactory?.CreateLogger(name);
+                    return new BaseLogger(sanitizedName, color, _sink, innerLogger, this);
+                }, LazyThreadSafetyMode.ExecutionAndPublication)
+            ).Value;
         }
 
         /// <summary>

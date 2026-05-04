@@ -37,6 +37,13 @@ namespace LogViewer
         public bool IsReadOnly => false;
 
         /// <summary>
+        /// Gets or sets how <see cref="AddRange"/> and <see cref="RemoveRange"/> raise
+        /// <see cref="CollectionChanged"/>. Defaults to <see cref="BatchNotificationMode.Reset"/>,
+        /// which is compatible with all WPF binding consumers.
+        /// </summary>
+        public BatchNotificationMode NotificationMode { get; set; } = BatchNotificationMode.Reset;
+
+        /// <summary>
         /// Gets or sets the <see cref="LogEventArgs"/> at the specified index.
         /// Setting an item replaces it only if it is not already present in the collection.
         /// </summary>
@@ -125,7 +132,21 @@ namespace LogViewer
                     _logs.AddRange(addedEvents);
             }
             if (added)
-                OnCollectionChanged(NotifyCollectionChangedAction.Add, addedEvents, startIndex);
+            {
+                switch (NotificationMode)
+                {
+                    case BatchNotificationMode.Atomic:
+                        OnCollectionChanged(NotifyCollectionChangedAction.Add, addedEvents, startIndex);
+                        break;
+                    case BatchNotificationMode.PerItem:
+                        for (int i = 0; i < addedEvents.Count; i++)
+                            OnCollectionChanged(NotifyCollectionChangedAction.Add, addedEvents[i], startIndex + i);
+                        break;
+                    default:
+                        OnCollectionChanged(NotifyCollectionChangedAction.Reset);
+                        break;
+                }
+            }
             return addedEvents.Count;
         }
 
@@ -185,7 +206,23 @@ namespace LogViewer
                 }
             }
             if (itemsToRemove.Count > 0)
-                OnCollectionChanged(NotifyCollectionChangedAction.Remove, itemsToRemove, startIndex);
+            {
+                switch (NotificationMode)
+                {
+                    case BatchNotificationMode.Atomic:
+                        OnCollectionChanged(NotifyCollectionChangedAction.Remove, itemsToRemove, startIndex);
+                        break;
+                    case BatchNotificationMode.PerItem:
+                        // Walk highest index first so each per-item Remove is valid
+                        // against the consumer's mirror state at the moment of the event.
+                        for (int i = itemsToRemove.Count - 1; i >= 0; i--)
+                            OnCollectionChanged(NotifyCollectionChangedAction.Remove, itemsToRemove[i], startIndex + i);
+                        break;
+                    default:
+                        OnCollectionChanged(NotifyCollectionChangedAction.Reset);
+                        break;
+                }
+            }
             return itemsToRemove.Count;
         }
 

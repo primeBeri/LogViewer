@@ -6,6 +6,7 @@ using Xunit;
 
 namespace LogViewer.Tests
 {
+    [Collection(GlobalStateCollection.Name)]
     public class BaseLoggerSinkTests
     {
         [Fact]

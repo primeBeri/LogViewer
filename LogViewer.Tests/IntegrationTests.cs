@@ -7,6 +7,7 @@ using Xunit;
 
 namespace LogViewer.Tests
 {
+    [Collection(GlobalStateCollection.Name)]
     public class IntegrationTests
     {
         [Fact]

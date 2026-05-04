@@ -492,7 +492,7 @@ namespace LogViewer
         /// <param name="formatter">A function that formats the state and exception into a log message string.</param>
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            string message = formatter(state, null);
+            string message = formatter(state, exception);
             if (exception is null)
                 Log(logLevel, message);
             else

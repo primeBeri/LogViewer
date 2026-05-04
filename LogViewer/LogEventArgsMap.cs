@@ -30,12 +30,7 @@ namespace LogViewer
             Map(m => m.LogHandle).Name("Handle");
             Map(m => m.LogText)
                 .Name("Message")
-                .Convert(args =>
-                {
-                    string sanitized = args.Value.LogText.Replace(Environment.NewLine, "{newline}");
-                    sanitized = sanitized.Replace("\"", "\"\""); // Escape double quotes for CSV
-                    return $"\"{sanitized}\"";
-                });
+                .Convert(args => args.Value.LogText.Replace(Environment.NewLine, "{newline}"));
         }
     }
 }

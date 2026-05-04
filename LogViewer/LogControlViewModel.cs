@@ -60,10 +60,16 @@ namespace LogViewer
         // CS8601: Possible null reference assignment.
         internal ILogger? Logger => _logger ??= CreateLoggerIfNotDesignMode(); // will never be null except for in design mode, where logging is not needed.
 
+        // Internal mutable storage. All write paths in the VM go through this
+        // field. The public LogEvents property exposes a read-only view so
+        // external consumers can't violate the VM's invariants (MaxLogSize
+        // trimming, sort order, UI-thread mutation).
+        private readonly LogCollection _logEvents = [];
+
         /// <summary>
-        /// Gets the observable collection of log events for data binding.
+        /// Gets the read-only observable collection of log events for data binding.
         /// </summary>
-        public LogCollection LogEvents { get; } = [];
+        public ReadOnlyLogCollection LogEvents { get; }
 
         /// <summary>
         /// Gets the command that exports application logs asynchronously.
@@ -111,14 +117,20 @@ namespace LogViewer
             set
             {
                 if (_isPaused == value) return;
+
+                bool shouldFlush;
                 lock (_pauseLock)
                 {
+                    if (_isPaused == value) return; // double-check under the lock
                     _isPaused = value;
-                    if (!_isPaused)
-                    {
-                        ResumeAndFlushLogs();
-                    }
+                    shouldFlush = !_isPaused;
                 }
+
+                // Flush outside the lock so DispatchIfNecessary's UI round-trip
+                // doesn't pin _pauseLock across the dispatcher invocation.
+                if (shouldFlush)
+                    ResumeAndFlushLogs();
+
                 PausedText = _isPaused ? "Resume" : "Pause";
             }
         }
@@ -229,10 +241,10 @@ namespace LogViewer
         public int MaxLogSize { get; set; } = BaseLogger.MaxLogQueueSize;
 
         /// <summary>
-        /// Gets or sets the format string used to display log entries.
+        /// Gets or sets the format string used to display log entries. The format
+        /// affects how each existing log event is rendered; the visible-log set
+        /// itself does not change.
         /// </summary>
-        /// <remarks>Changing this property triggers an update to the visible logs to reflect the new
-        /// format.</remarks>
         public string LogDisplayFormat
         {
             get => _logDisplayFormat;
@@ -240,15 +252,12 @@ namespace LogViewer
             {
                 if (_logDisplayFormat == value) return;
                 _logDisplayFormat = string.IsNullOrWhiteSpace(value) ? BaseLogger.DefaultLogDisplayFormat : value;
-                _ = UpdateVisibleLogsAsync();
             }
         }
 
         /// <summary>
         /// Gets or sets the delimiter used to format log entries for display.
         /// </summary>
-        /// <remarks>Changing this property triggers an asynchronous update of the visible logs to reflect
-        /// the new delimiter.</remarks>
         public string LogDisplayFormatDelimiter
         {
             get => _logDisplayFormatDelimiter;
@@ -256,7 +265,6 @@ namespace LogViewer
             {
                 if (_logDisplayFormatDelimiter == value) return;
                 _logDisplayFormatDelimiter = string.IsNullOrEmpty(value) ? " " : value;
-                _ = UpdateVisibleLogsAsync();
             }
         }
 
@@ -271,6 +279,7 @@ namespace LogViewer
         {
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _sink = sink ?? BaseLoggerSink.Instance;
+            LogEvents = new ReadOnlyLogCollection(_logEvents);
             LogHandleFilter = logHandleFilter ?? string.Empty;
             _logger = CreateLoggerIfNotDesignMode(); // will never be null except for in design mode, where logging is not needed.
             _sink.LogReceived += OnLogEventAsync;
@@ -406,9 +415,11 @@ namespace LogViewer
                 _ = UpdateVisibleLogsAsync();
                 return true;
             }
-            catch (ArgumentException)
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
             {
-                // Invalid regex pattern, do not change the filter.
+                // Invalid or unsupported regex pattern (e.g. NonBacktracking rejects
+                // backreferences and lookarounds with NotSupportedException). Do not
+                // change the filter.
                 return false;
             }
         }
@@ -420,7 +431,7 @@ namespace LogViewer
         {
             try
             {
-                await DispatchIfNecessaryAsync(() => LogEvents.Clear());
+                await DispatchIfNecessaryAsync(() => _logEvents.Clear());
             }
             catch (Exception ex)
             {
@@ -465,7 +476,7 @@ namespace LogViewer
                 // Trim to the most recent MaxLogSize entries if needed using index-based iteration
                 int startIndex = filteredLogs.Count > MaxLogSize ? filteredLogs.Count - MaxLogSize : 0;
                 var logsToAdd = filteredLogs.Skip(startIndex).ToList();
-                await DispatchIfNecessaryAsync(() => LogEvents.AddRange(logsToAdd));
+                await DispatchIfNecessaryAsync(() => _logEvents.AddRange(logsToAdd));
             }
             catch (Exception ex)
             {
@@ -487,24 +498,24 @@ namespace LogViewer
         /// </summary>
         private void ResumeAndFlushLogs()
         {
-            if (_pauseBuffer.Count == 0) return;
-
             LogEventArgs[] bufferCopy;
             lock (_pauseLock)
             {
+                if (_pauseBuffer.Count == 0) return;
                 bufferCopy = [.. _pauseBuffer];
                 _pauseBuffer.Clear();
             }
+
             DispatchIfNecessary(() =>
             {
-                LogEvents.AddRange(bufferCopy);
+                _logEvents.AddRange(bufferCopy);
 
-                int overFlow = LogEvents.Count - MaxLogSize;
+                int overFlow = _logEvents.Count - MaxLogSize;
                 if (overFlow > 0)
                 {
                     // Remove a little more than the overflow to reduce frequent trimming.
                     int amountToRemove = overFlow + ((int)(MaxLogSize * 0.1));
-                    LogEvents.RemoveRange(0, amountToRemove); // Remove oldest
+                    _logEvents.RemoveRange(0, amountToRemove); // Remove oldest
                 }
                 return true;
             });
@@ -518,15 +529,18 @@ namespace LogViewer
         {
             try
             {
-                await DispatchIfNecessaryAsync(() => LogEvents.Add(e));
-
-                int overFlow = LogEvents.Count - MaxLogSize;
-                if (overFlow > 0)
+                await DispatchIfNecessaryAsync(() =>
                 {
-                    // Remove a little more than the overflow to reduce frequent trimming.
-                    int amountToRemove = overFlow + ((int)(MaxLogSize * 0.1));
-                    await DispatchIfNecessaryAsync(() => LogEvents.RemoveRange(0, amountToRemove)); // Remove oldest
-                }
+                    _logEvents.Add(e);
+
+                    int overFlow = _logEvents.Count - MaxLogSize;
+                    if (overFlow > 0)
+                    {
+                        // Remove a little more than the overflow to reduce frequent trimming.
+                        int amountToRemove = overFlow + ((int)(MaxLogSize * 0.1));
+                        _logEvents.RemoveRange(0, amountToRemove); // Remove oldest
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -666,7 +680,7 @@ namespace LogViewer
                     return output;
                 }
 
-                var exportLogs = new List<LogEventArgs>([.. LogEvents]);
+                var exportLogs = new List<LogEventArgs>([.. _logEvents]);
                 output.FileType = SelectedExportFileType;
                 output.FilePath = filePath;
                 StringBuilder contents = (SelectedExportFileType?.Extension ?? ".json") switch

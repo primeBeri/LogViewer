@@ -52,6 +52,18 @@ namespace LogViewer
             _viewModel = new LogControlViewModel(Dispatcher);
             this.DataContext = _viewModel;
 
+            // Sync any XAML-set DP values into the VM. The changed-callbacks
+            // skip the VM update during InitializeComponent because _viewModel
+            // is null at that point.
+            _viewModel.MaxLogSize = MaxLogSize;
+            _viewModel.LogHandleFilter = HandleFilter;
+            _viewModel.LogHandleIgnoreCase = IgnoreCase;
+            _viewModel.AutoScroll = AutoScroll;
+            _viewModel.HandleFilterVisible = HandleFilterVisible;
+            _viewModel.PausingEnabled = PausingEnabled;
+            _viewModel.LogDisplayFormat = LogDisplayFormat;
+            _viewModel.LogDisplayFormatDelimiter = LogDisplayFormatDelimiter;
+
             __logList.ItemTemplate = GenerateDataTemplate(LogDisplayFormat, LogDisplayFormatDelimiter);
 
             _viewModel.LogEvents.CollectionChanged += HandleCollectionChanged;
@@ -70,14 +82,7 @@ namespace LogViewer
         public int MaxLogSize
         {
             get => (int)GetValue(MaxLogSizeProperty);
-            set
-            {
-                if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "MaxLogSize cannot be negative.");
-                int newValue = value > BaseLogger.MaxLogQueueSize ? BaseLogger.MaxLogQueueSize : value;
-
-                SetValue(MaxLogSizeProperty, newValue);
-                _viewModel.MaxLogSize = newValue;
-            }
+            set => SetValue(MaxLogSizeProperty, value);
         }
 
         /// <summary>
@@ -88,11 +93,7 @@ namespace LogViewer
         public string HandleFilter
         {
             get => (string)GetValue(HandleFilterProperty) ?? string.Empty;
-            set
-            {
-                SetValue(HandleFilterProperty, value);
-                _viewModel.LogHandleFilter = value ?? string.Empty;
-            }
+            set => SetValue(HandleFilterProperty, value);
         }
 
         /// <summary>
@@ -101,11 +102,7 @@ namespace LogViewer
         public bool IgnoreCase
         {
             get => (bool)GetValue(IgnoreCaseProperty);
-            set
-            {
-                SetValue(IgnoreCaseProperty, value);
-                _viewModel.LogHandleIgnoreCase = value;
-            }
+            set => SetValue(IgnoreCaseProperty, value);
         }
 
         /// <summary>
@@ -115,11 +112,7 @@ namespace LogViewer
         public bool AutoScroll
         {
             get => (bool)GetValue(AutoScrollProperty);
-            set
-            {
-                SetValue(AutoScrollProperty, value);
-                _viewModel.AutoScroll = value;
-            }
+            set => SetValue(AutoScrollProperty, value);
         }
 
         /// <summary>
@@ -128,11 +121,7 @@ namespace LogViewer
         public bool HandleFilterVisible
         {
             get => (bool)GetValue(HandleFilterVisibleProperty);
-            set
-            {
-                SetValue(HandleFilterVisibleProperty, value);
-                _viewModel.HandleFilterVisible = value;
-            }
+            set => SetValue(HandleFilterVisibleProperty, value);
         }
 
         /// <summary>
@@ -141,11 +130,7 @@ namespace LogViewer
         public bool PausingEnabled
         {
             get => (bool)GetValue(PausingEnabledProperty);
-            set
-            {
-                SetValue(PausingEnabledProperty, value);
-                _viewModel.PausingEnabled = value;
-            }
+            set => SetValue(PausingEnabledProperty, value);
         }
 
         /// <summary>
@@ -154,13 +139,7 @@ namespace LogViewer
         public string LogDisplayFormat
         {
             get => (string)GetValue(LogDisplayFormatProperty);
-            set
-            {
-                string newFormat = string.IsNullOrWhiteSpace(value) ? BaseLogger.DefaultLogDisplayFormat : value;
-                SetValue(LogDisplayFormatProperty, newFormat);
-                __logList.ItemTemplate = GenerateDataTemplate(newFormat, _viewModel.LogDisplayFormatDelimiter);
-                _viewModel.LogDisplayFormat = newFormat;
-            }
+            set => SetValue(LogDisplayFormatProperty, value);
         }
 
         /// <summary>
@@ -171,13 +150,7 @@ namespace LogViewer
         public string LogDisplayFormatDelimiter
         {
             get => (string)GetValue(LogDisplayFormatDelimiterProperty);
-            set
-            {
-                string newDelimiter = string.IsNullOrEmpty(value) ? " " : value;
-                SetValue(LogDisplayFormatDelimiterProperty, value);
-                __logList.ItemTemplate = GenerateDataTemplate(_viewModel.LogDisplayFormat, newDelimiter);
-                _viewModel.LogDisplayFormatDelimiter = newDelimiter;
-            }
+            set => SetValue(LogDisplayFormatDelimiterProperty, value);
         }
 
         /// <summary>
@@ -206,9 +179,7 @@ namespace LogViewer
         {
             if (d is LogControl control && control._viewModel != null)
             {
-#pragma warning disable CS8601 // Possible null reference assignment | null value is handled inside LogHandleFilter
-                control._viewModel.LogHandleFilter = e.NewValue as string;
-#pragma warning restore CS8601 // Possible null reference assignment.
+                control._viewModel.LogHandleFilter = (e.NewValue as string) ?? string.Empty;
             }
         }
 
@@ -237,7 +208,7 @@ namespace LogViewer
         /// <param name="e">The event data containing information about the property change, including the old and new values.</param>
         private static void OnAutoScrollChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is LogControl control)
+            if (d is LogControl control && control._viewModel != null)
             {
                 control._viewModel.AutoScroll = (bool)e.NewValue;
                 // If auto-scroll is enabled, scroll to the end of the log list.
@@ -292,10 +263,7 @@ namespace LogViewer
         {
             if (d is LogControl control && control._viewModel != null)
             {
-#pragma warning disable CS8601 // Possible null reference assignment | null value is handled inside LogDisplayFormat
-                string newFormat = e.NewValue as string ?? BaseLogger.DefaultLogDisplayFormat;
-#pragma warning restore CS8601 // Possible null reference assignment.
-                if (string.IsNullOrEmpty(newFormat)) newFormat = BaseLogger.DefaultLogDisplayFormat;
+                var newFormat = (string)e.NewValue;
                 control.__logList.ItemTemplate = control.GenerateDataTemplate(newFormat, control._viewModel.LogDisplayFormatDelimiter);
                 control._viewModel.LogDisplayFormat = newFormat;
             }
@@ -314,21 +282,10 @@ namespace LogViewer
         {
             if (d is LogControl control && control._viewModel != null)
             {
-#pragma warning disable CS8601 // Possible null reference assignment | null value is handled inside LogDisplayFormatDelimiter
-                string newDelimiter = e.NewValue as string ?? " ";
-#pragma warning restore CS8601 // Possible null reference assignment.
-                if (string.IsNullOrEmpty(newDelimiter)) newDelimiter = " ";
+                var newDelimiter = (string)e.NewValue;
                 control.__logList.ItemTemplate = control.GenerateDataTemplate(control._viewModel.LogDisplayFormat, newDelimiter);
                 control._viewModel.LogDisplayFormatDelimiter = newDelimiter;
             }
-        }
-
-        /// <summary>
-        /// Handles the Unloaded event for the control, ensuring resources are disposed.
-        /// </summary>
-        private void LogViewer_Unloaded(object sender, RoutedEventArgs e)
-        {
-            _viewModel?.Dispose();
         }
 
         /// <summary>
@@ -764,7 +721,18 @@ namespace LogViewer
             nameof(MaxLogSize),
             typeof(int),
             typeof(LogControl),
-            new PropertyMetadata(BaseLogger.MaxLogQueueSize, OnMaxLogSizeChanged));
+            new PropertyMetadata(BaseLogger.MaxLogQueueSize, OnMaxLogSizeChanged, CoerceMaxLogSize),
+            ValidateMaxLogSize);
+
+        private static bool ValidateMaxLogSize(object value) => value is int i && i >= 0;
+
+#pragma warning disable CA1859 // CoerceValueCallback signature requires object return type
+        private static object CoerceMaxLogSize(DependencyObject d, object baseValue)
+        {
+            int v = (int)baseValue;
+            return v > BaseLogger.MaxLogQueueSize ? BaseLogger.MaxLogQueueSize : v;
+        }
+#pragma warning restore CA1859
 
         /// <summary>
         /// Identifies the <see cref="HandleFilter"/> dependency property.
@@ -837,7 +805,10 @@ namespace LogViewer
             nameof(LogDisplayFormat),
             typeof(string),
             typeof(LogControl),
-            new PropertyMetadata(BaseLogger.DefaultLogDisplayFormat, OnHandleLogDisplayFormatChanged));
+            new PropertyMetadata(BaseLogger.DefaultLogDisplayFormat, OnHandleLogDisplayFormatChanged, CoerceLogDisplayFormat));
+
+        private static object CoerceLogDisplayFormat(DependencyObject d, object baseValue)
+            => string.IsNullOrWhiteSpace(baseValue as string) ? BaseLogger.DefaultLogDisplayFormat : baseValue;
 
         /// <summary>
         /// Identifies the <see cref="LogDisplayFormatDelimiter"/> dependency property.
@@ -848,7 +819,10 @@ namespace LogViewer
             nameof(LogDisplayFormatDelimiter),
             typeof(string),
             typeof(LogControl),
-            new PropertyMetadata(" ", OnHandleLogDisplayFormatDelimiterChanged));
+            new PropertyMetadata(" ", OnHandleLogDisplayFormatDelimiterChanged, CoerceLogDisplayFormatDelimiter));
+
+        private static object CoerceLogDisplayFormatDelimiter(DependencyObject d, object baseValue)
+            => string.IsNullOrEmpty(baseValue as string) ? " " : baseValue;
         #endregion
 
         #region IDisposable Support
@@ -865,7 +839,7 @@ namespace LogViewer
                 if (disposing)
                 {
                     _viewModel.LogEvents.CollectionChanged -= HandleCollectionChanged;
-                    _viewModel?.Dispose();
+                    _viewModel.Dispose();
                 }
 
                 _disposedValue = true;
