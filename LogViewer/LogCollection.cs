@@ -23,13 +23,6 @@ namespace LogViewer
         {
             get { lock (_lockObject) { return _logs.Count; } }
         }
-        /// <summary>
-        /// Gets a snapshot of the log entries in the collection.
-        /// </summary>
-        public IEnumerable<LogEventArgs> Items
-        {
-            get { lock (_lockObject) { return [.. _logs]; } }
-        }
 
         /// <summary>
         /// Gets a value indicating whether the collection is read-only. Always returns false.
@@ -63,6 +56,8 @@ namespace LogViewer
                     // Only allow replacement if the new value is not already present
                     if (_logSet.Add(value))
                     {
+                        // Remove the old value from the set so set and list stay consistent
+                        _logSet.Remove(_logs[index]);
                         _logs[index] = value;
                         added = true;
                     }
@@ -246,7 +241,6 @@ namespace LogViewer
         [SuppressPropertyChangedWarnings]
         protected void OnCollectionChanged(NotifyCollectionChangedAction action)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Items)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action));
         }
@@ -260,7 +254,6 @@ namespace LogViewer
         [SuppressPropertyChangedWarnings]
         protected void OnCollectionChanged(NotifyCollectionChangedAction action, object? item = null, int index = -1)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Items)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItem: item, index: index));
         }
@@ -275,7 +268,6 @@ namespace LogViewer
         protected void OnCollectionChanged(NotifyCollectionChangedAction action, IList? items = null, int index = -1)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Items)));
             CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(action, changedItems: items, index));
         }
 

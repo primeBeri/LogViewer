@@ -1,6 +1,6 @@
 # LogViewer (RealTimeLogStream)
 
-**Version:** 0.3.0 | **Framework:** .NET 8.0 Windows | **License:** MIT
+**Version:** 0.3.1 | **Framework:** .NET 8.0 Windows | **License:** MIT
 
 A real-time log viewer control for .NET 8 WPF applications. LogViewer integrates seamlessly with `Microsoft.Extensions.Logging` to display structured, color-coded, filterable logs in your application's UI.
 
@@ -33,7 +33,7 @@ dotnet add package RealTimeLogStream --source https://nuget.pkg.github.com/Arise
 Or add to your `.csproj`:
 
 ```xml
-<PackageReference Include="RealTimeLogStream" Version="0.3.0" />
+<PackageReference Include="RealTimeLogStream" Version="0.3.1" />
 ```
 
 ### Project Reference
@@ -201,11 +201,14 @@ Customize how log entries are displayed using format placeholders. Placeholder n
 
 ### Wildcard Filtering
 
-Wildcards are automatically converted to regex:
+Wildcards are automatically converted to regex. `*` matches any sequence of characters, `?` matches a single character, and `|` separates alternative patterns:
 
 ```xml
 <logViewer:LogControl HandleFilter="*Service*" IgnoreCase="True"/>
+<logViewer:LogControl HandleFilter="*Service*|*Handler*" IgnoreCase="True"/>
 ```
+
+> **Note:** Literal pipe characters are not supported in wildcards because `|` is reserved as the alternation separator. If your handles contain `|`, set `HandleFilter` to a hand-written regex instead of going through `WildcardToRegex`.
 
 ### Programmatic Filtering
 
@@ -339,6 +342,24 @@ See the `LogViewerExample` project for a complete working example demonstrating:
 - Integration with NLog
 - Continuous log generation for testing
 - Exception logging
+
+---
+
+## Upgrading from 0.3.0 to 0.3.1
+
+0.3.1 is a follow-up cleanup release. Most consumers can upgrade without code changes. Breaking changes:
+
+- **`LogEventArgs.ID`** has been removed. The property was `[Obsolete]` since 0.2.x with a "use reference equality instead" notice. If you were suppressing the obsolete warning to keep using it, switch to `ReferenceEquals(a, b)` or rely on `Equals`/`GetHashCode` (already implemented as identity comparison).
+- **`BaseLogger.SupportedExportFileTypes`** is now `IReadOnlyList<FileType>` (was `ObservableCollection<FileType>`). Code that declared the variable as `ObservableCollection<FileType>` won't compile. Code that used it as `IEnumerable<FileType>` or duck-typed via `foreach` is unaffected. The set of supported export formats is fixed at class initialization and was never legitimately mutable; the type now matches.
+- **`LogCollection.Items`** has been removed. The property returned a snapshot copy on every access; consumers can iterate the collection directly (`foreach (var e in collection)` already returns a thread-safe snapshot via `GetEnumerator`).
+
+Bug fix worth flagging:
+- `LogCollection`'s indexer setter previously left the internal duplicate-detection set inconsistent after a replacement, causing `Contains(oldItem)` to return `true` even though the item had been overwritten. Setter now removes the old value from the set; `Contains` reflects post-replacement state.
+
+Internal cleanups (no consumer impact):
+- `LogExporter` extracted from `LogControlViewModel` as an `internal static class`. Export pipeline is now a coherent unit; the VM keeps the orchestration in `ExportLogsAsync`.
+- Test coverage expanded from 39 to 114 tests.
+- Various small cleanups: `__logList` → `_logList`, dead-branch removal in `IsLogEventHandleFiltered`, `PauseBufferCount` now reads under `_pauseLock`, NuGet workflow runs tests before publish.
 
 ---
 

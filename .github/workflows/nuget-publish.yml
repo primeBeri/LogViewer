@@ -40,6 +40,9 @@ jobs:
     - name: Build the project
       run: dotnet build ./LogViewer/LogViewer.csproj --configuration Release
 
+    - name: Test
+      run: dotnet test ./LogViewer.Tests/LogViewer.Tests.csproj --configuration Release
+
     - name: Build and pack
       run: dotnet pack ./LogViewer/LogViewer.csproj --configuration Release --output ./nupkgs
 

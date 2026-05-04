@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -12,8 +11,6 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using PropertyChanged;
 using Microsoft.Win32;
-using Newtonsoft.Json;
-using System.Runtime.InteropServices;
 using System.IO;
 using System.Diagnostics;
 
@@ -92,9 +89,9 @@ namespace LogViewer
         /// </summary>
         public string PausedText { get; internal set; } = "Pause";
         /// <summary>
-        /// Gets the collection of file types supported for export.
+        /// Gets the read-only list of file types supported for export.
         /// </summary>
-        public static ObservableCollection<FileType> SupportedExportFileTypes => BaseLogger.SupportedExportFileTypes;
+        public static IReadOnlyList<FileType> SupportedExportFileTypes => BaseLogger.SupportedExportFileTypes;
         /// <summary>
         /// Gets or sets the file type selected for export operations.
         /// </summary>
@@ -104,7 +101,7 @@ namespace LogViewer
         /// </summary>
         public int PauseBufferCount
         {
-            get => _pauseBuffer?.Count ?? 0;
+            get { lock (_pauseLock) { return _pauseBuffer.Count; } }
         }
 
         /// <summary>
@@ -292,7 +289,9 @@ namespace LogViewer
             });
             ExportLogsCommand = new AsyncRelayCommand(async () => _ = await ExportLogsAsync());
 
-            SelectedExportFileType = SupportedExportFileTypes.FirstOrDefault() ?? new FileType("JSON", ".json");
+            SelectedExportFileType = SupportedExportFileTypes.Count > 0
+                ? SupportedExportFileTypes[0]
+                : new FileType("JSON", ".json");
         }
 
         /// <summary>
@@ -340,9 +339,7 @@ namespace LogViewer
         /// <returns>True if the log handle matches the filter; otherwise, false.</returns>
         private bool IsLogEventHandleFiltered(string? logHandle)
         {
-            if (string.IsNullOrWhiteSpace(LogHandleFilter)) return true;
             if (string.IsNullOrWhiteSpace(logHandle)) return false;
-            // Check if the filter string contains the log handle
             return _handleCheck.IsMatch(logHandle);
         }
 
@@ -372,9 +369,15 @@ namespace LogViewer
         }
 
         /// <summary>
-        /// Converts a wildcard pattern (with * and ?) to a regex string.
-        /// Supports multiple patterns separated by '|'.
+        /// Converts a wildcard pattern (with <c>*</c> and <c>?</c>) to a regex string.
+        /// Supports multiple patterns separated by <c>|</c> (treated as alternation).
         /// </summary>
+        /// <remarks>
+        /// Literal pipe characters are not supported in wildcards because <c>|</c> is
+        /// reserved as the alternation separator. If your handles contain <c>|</c>,
+        /// assign a hand-written regex to <see cref="LogHandleFilter"/> directly
+        /// instead of going through this conversion.
+        /// </remarks>
         /// <param name="pattern">The wildcard pattern.</param>
         /// <returns>A regex string equivalent to the wildcard pattern.</returns>
         public static string WildcardToRegex(string? pattern)
@@ -685,9 +688,9 @@ namespace LogViewer
                 output.FilePath = filePath;
                 StringBuilder contents = (SelectedExportFileType?.Extension ?? ".json") switch
                 {
-                    ".json" => await GetLogsAsJsonTextAsync(exportLogs),
-                    ".txt"  => await GetLogsAsTextAsync(exportLogs, LogExportFormat),
-                    ".csv"  => await GetLogsAsCSVTextAsync(exportLogs),
+                    ".json" => await LogExporter.GetLogsAsJsonTextAsync(exportLogs),
+                    ".txt"  => await LogExporter.GetLogsAsTextAsync(exportLogs, LogExportFormat),
+                    ".csv"  => await LogExporter.GetLogsAsCSVTextAsync(exportLogs),
                     _       => new StringBuilder()
                 };
 
@@ -714,67 +717,6 @@ namespace LogViewer
                 if (!skipRestoreExportingLogs) ExportingLogs = false;
             }
             return output;
-        }
-
-        /// <summary>
-        /// Converts a collection of log events into a JSON-formatted string asynchronously.
-        /// </summary>
-        /// <param name="logEvents">A collection of <see cref="LogEventArgs"/> representing the log events to be serialized. Cannot be <see
-        /// langword="null"/>.</param>
-        /// <returns>A <see cref="StringBuilder"/> containing the JSON-formatted representation of the log events.</returns>
-        private async static Task<StringBuilder> GetLogsAsJsonTextAsync(IEnumerable<LogEventArgs> logEvents)
-        {
-            ArgumentNullException.ThrowIfNull(logEvents, paramName: nameof(logEvents));
-
-            return await Task.Run(() => new StringBuilder(JsonConvert.SerializeObject(logEvents, Formatting.Indented)));
-        }
-
-        /// <summary>
-        /// Asynchronously converts a collection of log events into a single text representation.
-        /// </summary>
-        /// <remarks>This method processes the log events on a background thread to avoid blocking the
-        /// calling thread. Each log event is formatted using the <see cref="LogEventArgs.FormatLogMessage"/> method,
-        /// with the specified or default format.</remarks>
-        /// <param name="logEvents">A collection of <see cref="LogEventArgs"/> instances representing the log events to process. Cannot be <see
-        /// langword="null"/>.</param>
-        /// <param name="logExportFormat">An optional format string used to format each log event. If <see langword="null"/>, a default format is
-        /// applied.</param>
-        /// <returns>A <see cref="StringBuilder"/> containing the formatted text representation of the provided log events.</returns>
-        private async static Task<StringBuilder> GetLogsAsTextAsync(IEnumerable<LogEventArgs> logEvents, string? logExportFormat = null)
-        {
-            ArgumentNullException.ThrowIfNull(logEvents, paramName: nameof(logEvents));
-
-            return await Task.Run(() =>
-            {
-                StringBuilder sb = new();
-                foreach (var logEvent in logEvents)
-                {
-                    sb.AppendLine(logEvent.FormatLogMessage(logExportFormat));
-                }
-                return sb;
-            });
-        }
-
-        /// <summary>
-        /// Converts a collection of log events into a CSV-formatted string asynchronously.
-        /// </summary>
-        /// <remarks>This method uses the CsvHelper library to serialize the provided log events into CSV
-        /// format. The returned <see cref="StringBuilder"/> contains the CSV data, which can be further processed or
-        /// saved as needed.</remarks>
-        /// <param name="logEvents">The collection of log events to be converted. Cannot be <see langword="null"/>.</param>
-        /// <returns>A <see cref="StringBuilder"/> containing the CSV-formatted representation of the log events.</returns>
-        private async static Task<StringBuilder> GetLogsAsCSVTextAsync(IEnumerable<LogEventArgs> logEvents)
-        {
-            ArgumentNullException.ThrowIfNull(logEvents, paramName: nameof(logEvents));
-
-            StringBuilder sb = new();
-
-            await using var writer = new StringWriter(sb);
-            await using var csv = new CsvHelper.CsvWriter(writer, System.Globalization.CultureInfo.InvariantCulture);
-            csv.Context.RegisterClassMap<LogEventArgsMap>();
-            await csv.WriteRecordsAsync(logEvents);
-
-            return sb;
         }
 
         #region IDisposable Support

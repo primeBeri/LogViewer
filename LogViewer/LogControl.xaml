@@ -43,7 +43,7 @@
                    VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                    Visibility="{Binding IsPaused, Converter={StaticResource BooleanToVisibilityConverterKey}}"/>
         </Grid>
-        <ListView x:Name="__logList" Grid.Row="0" ItemsSource="{Binding LogEvents, Mode=OneWay}" FontFamily="Consolas" FontSize="12" Margin="5"
+        <ListView x:Name="_logList" Grid.Row="0" ItemsSource="{Binding LogEvents, Mode=OneWay}" FontFamily="Consolas" FontSize="12" Margin="5"
                   ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ScrollViewer.HorizontalScrollBarVisibility="Auto"
                   ScrollViewer.CanContentScroll="true"

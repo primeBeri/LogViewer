@@ -58,25 +58,12 @@ namespace LogViewer
         /// </summary>
         public int ThreadId { get; } = Environment.CurrentManagedThreadId;
 
-        private readonly Lazy<Guid> _lazyId = new(() => Guid.NewGuid());
-        /// <summary>
-        /// Gets the unique identifier for this log event instance.
-        /// </summary>
-        /// <remarks>
-        /// This property is obsolete. Use reference equality instead for comparing LogEventArgs instances.
-        /// The property is retained for backwards compatibility but may be removed in a future version.
-        /// </remarks>
-        [Obsolete("Use reference equality instead. This property may be removed in a future version.")]
-        [JsonIgnore] public Guid ID => _lazyId.Value;
-
         /// <summary>
         /// Returns the main parts of the log message as a tuple: timestamp, handle, and message body.
         /// </summary>
         /// <returns>A tuple containing the formatted timestamp, log handle, and log text.</returns>
         public (string Timestamp, string LogHandle, string Body) GetLogMessageParts()
-        {
-            return ($"{LogDateTime.ToString(BaseLogger.LogDateTimeFormat, CultureInfo.InvariantCulture)}", LogHandle, LogText);
-        }
+            => (LogDateTimeFormatted, LogHandle, LogText);
 
         /// <summary>
         /// Returns a string representation of the log event, suitable for display or logging.

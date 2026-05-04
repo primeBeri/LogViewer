@@ -64,7 +64,7 @@ namespace LogViewer
             _viewModel.LogDisplayFormat = LogDisplayFormat;
             _viewModel.LogDisplayFormatDelimiter = LogDisplayFormatDelimiter;
 
-            __logList.ItemTemplate = GenerateDataTemplate(LogDisplayFormat, LogDisplayFormatDelimiter);
+            _logList.ItemTemplate = GenerateDataTemplate(LogDisplayFormat, LogDisplayFormatDelimiter);
 
             _viewModel.LogEvents.CollectionChanged += HandleCollectionChanged;
         }
@@ -264,7 +264,7 @@ namespace LogViewer
             if (d is LogControl control && control._viewModel != null)
             {
                 var newFormat = (string)e.NewValue;
-                control.__logList.ItemTemplate = control.GenerateDataTemplate(newFormat, control._viewModel.LogDisplayFormatDelimiter);
+                control._logList.ItemTemplate = control.GenerateDataTemplate(newFormat, control._viewModel.LogDisplayFormatDelimiter);
                 control._viewModel.LogDisplayFormat = newFormat;
             }
         }
@@ -283,7 +283,7 @@ namespace LogViewer
             if (d is LogControl control && control._viewModel != null)
             {
                 var newDelimiter = (string)e.NewValue;
-                control.__logList.ItemTemplate = control.GenerateDataTemplate(control._viewModel.LogDisplayFormat, newDelimiter);
+                control._logList.ItemTemplate = control.GenerateDataTemplate(control._viewModel.LogDisplayFormat, newDelimiter);
                 control._viewModel.LogDisplayFormatDelimiter = newDelimiter;
             }
         }
@@ -324,7 +324,7 @@ namespace LogViewer
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
                 // Lazily find the ScrollViewer for the log list if not already found.
-                _scrollViewer ??= GetScrollViewer(__logList);
+                _scrollViewer ??= GetScrollViewer(_logList);
 
                 if (_scrollViewer is not null && _viewModel.AutoScroll)
                 {
@@ -439,7 +439,7 @@ namespace LogViewer
                     BaseLogger.LogExceptionActions[LogLevel.Critical](_viewModel.Logger, "Error generating log display template", ex);
                 }
 
-                return __logList.ItemTemplate; // Return the existing template as a fallback.
+                return _logList.ItemTemplate; // Return the existing template as a fallback.
             }
         }
 
@@ -564,8 +564,8 @@ namespace LogViewer
         /// </summary>
         /// <remarks>The generated elements include: <list type="bullet"> <item> A prefix element if the
         /// log handle contains text before the "{handle}" placeholder. </item> <item> A dynamically bound element for
-        /// the log handle itself, with bindings to properties such as <see cref="LogEventArgs.LogHandle"/>, <see
-        /// cref="LogEventArgs.LogLevel"/>, and <see cref="LogEventArgs.ID"/>. </item> <item> A suffix element if the
+        /// the log handle itself, with bindings to properties such as <see cref="LogEventArgs.LogHandle"/> and <see
+        /// cref="LogEventArgs.LogLevel"/>. </item> <item> A suffix element if the
         /// log handle contains text after the "{handle}" placeholder. </item> </list> The log handle element's
         /// foreground color is dynamically determined using a converter bound to the log level.</remarks>
         /// <param name="logHandle">A string representing the log handle, which may include the placeholder "{handle}" to indicate where the

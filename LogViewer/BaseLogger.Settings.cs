@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media;
 using Microsoft.Extensions.Logging;
@@ -195,11 +194,12 @@ namespace LogViewer
         /// memory.</remarks>
         public static int MaxLogQueueSize { get; set; } = 10000;
         /// <summary>
-        /// Gets the collection of file types supported for export operations.
+        /// Gets the read-only list of file types supported for export operations.
         /// </summary>
         /// <remarks>This property provides a predefined list of file types that can be used for exporting
-        /// data.  The collection includes common formats such as text files, CSV files, and JSON files.</remarks>
-        public static ObservableCollection<FileType> SupportedExportFileTypes { get; } = [
+        /// data. The list includes common formats such as text files, CSV files, and JSON files. The set of supported
+        /// formats is fixed at class initialization and shared across all consumers.</remarks>
+        public static IReadOnlyList<FileType> SupportedExportFileTypes { get; } = [
             new("Text file", ".txt"),
             new("CSV file", ".csv"),
             new("JSON file", ".json")
