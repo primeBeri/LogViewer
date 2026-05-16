@@ -26,10 +26,10 @@ Four phases transform the current `net10.0-windows`-only library (score 67/100) 
   5. The CI pipeline (`nuget-publish.yml`) completes both build and publish steps without SDK version errors
 **Plans**: 4 plans
 Plans:
-- [ ] 01-01-PLAN.md — Multi-target csproj: switch to TargetFrameworks, add conditional Microsoft.Extensions.* package versions
-- [ ] 01-02-PLAN.md — Fix ExportLogResult.Success bug: set output.Success = true on the happy path
-- [ ] 01-03-PLAN.md — Update CI workflow: dual SDK setup-dotnet@v4, PowerShell publish loop
-- [ ] 01-04-PLAN.md — Update README framework documentation to list both net8.0-windows and net10.0-windows
+- [x] 01-01-PLAN.md — Multi-target csproj: switch to TargetFrameworks, add conditional Microsoft.Extensions.* package versions
+- [x] 01-02-PLAN.md — Fix ExportLogResult.Success bug: set output.Success = true on the happy path
+- [x] 01-03-PLAN.md — Update CI workflow: dual SDK setup-dotnet@v4, PowerShell publish loop
+- [x] 01-04-PLAN.md — Update README framework documentation to list both net8.0-windows and net10.0-windows
 **UI hint**: no
 
 ### Phase 2: Architecture Foundations
