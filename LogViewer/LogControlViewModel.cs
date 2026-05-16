@@ -697,6 +697,7 @@ namespace LogViewer
                 await using var writer = new StreamWriter(filePath, append: false, encoding: Encoding.UTF8);
                 await writer.WriteAsync(contents.ToString().AsMemory(), cancellationToken: cancellationToken);
                 await writer.FlushAsync(cancellationToken);
+                output.Success = true;
             }
             catch (Exception ex)
             {
