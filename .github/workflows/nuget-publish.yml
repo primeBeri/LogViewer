@@ -55,7 +55,7 @@ jobs:
       run: |
         Get-ChildItem ./nupkgs -Include *.nupkg,*.snupkg -Recurse | ForEach-Object {
           Write-Host "Publishing $($_.Name)"
-          dotnet nuget push $_.FullName --source "github" --api-key ${{ secrets.GH_PKG_TOKEN }}
+          dotnet nuget push $_.FullName --source "github" --api-key $env:NUGET_TOKEN --skip-duplicate
         }
       env:
-        nuget-api-key: ${{ secrets.GH_PKG_TOKEN }}
+        NUGET_TOKEN: ${{ secrets.GH_PKG_TOKEN }}
