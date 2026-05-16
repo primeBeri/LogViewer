@@ -24,7 +24,12 @@ Four phases transform the current `net10.0-windows`-only library (score 67/100) 
   3. The published NuGet package contains both `lib/net8.0-windows/` and `lib/net10.0-windows/` output folders
   4. `ExportLogResult.Success` is `true` after a successful log export; callers can reliably detect success vs failure
   5. The CI pipeline (`nuget-publish.yml`) completes both build and publish steps without SDK version errors
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 01-01-PLAN.md — Multi-target csproj: switch to TargetFrameworks, add conditional Microsoft.Extensions.* package versions
+- [ ] 01-02-PLAN.md — Fix ExportLogResult.Success bug: set output.Success = true on the happy path
+- [ ] 01-03-PLAN.md — Update CI workflow: dual SDK setup-dotnet@v4, PowerShell publish loop
+- [ ] 01-04-PLAN.md — Update README framework documentation to list both net8.0-windows and net10.0-windows
 **UI hint**: no
 
 ### Phase 2: Architecture Foundations
@@ -69,7 +74,7 @@ Four phases transform the current `net10.0-windows`-only library (score 67/100) 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Critical Blockers | 0/TBD | Not started | - |
+| 1. Critical Blockers | 0/4 | Not started | - |
 | 2. Architecture Foundations | 0/TBD | Not started | - |
 | 3. Global State Elimination | 0/TBD | Not started | - |
 | 4. Polish and Dependencies | 0/TBD | Not started | - |
