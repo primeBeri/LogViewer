@@ -127,7 +127,7 @@ namespace LogViewer
                             tasks[i] = Task.CompletedTask;
                         }
                     }
-                    await Task.WhenAll(tasks.AsSpan(0, length)).ConfigureAwait(false);
+                    await Task.WhenAll(tasks[..length]).ConfigureAwait(false);
                 }
                 finally
                 {
