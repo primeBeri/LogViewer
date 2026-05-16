@@ -1,8 +1,8 @@
 # LogViewer (RealTimeLogStream)
 
-**Version:** 0.3.1 | **Framework:** .NET 8.0 Windows | **License:** MIT
+**Version:** 0.3.1 | **Frameworks:** .NET 8+ Windows (`net8.0-windows`, `net10.0-windows`) | **License:** MIT
 
-A real-time log viewer control for .NET 8 WPF applications. LogViewer integrates seamlessly with `Microsoft.Extensions.Logging` to display structured, color-coded, filterable logs in your application's UI.
+A real-time log viewer control for .NET 8 and .NET 10 WPF applications. LogViewer integrates seamlessly with `Microsoft.Extensions.Logging` to display structured, color-coded, filterable logs in your application's UI.
 
 ---
 
@@ -29,6 +29,8 @@ A real-time log viewer control for .NET 8 WPF applications. LogViewer integrates
 ```bash
 dotnet add package RealTimeLogStream --source https://nuget.pkg.github.com/ArisenVendetta/index.json
 ```
+
+> **Supported frameworks:** `net8.0-windows`, `net10.0-windows`
 
 Or add to your `.csproj`:
 
