@@ -98,7 +98,7 @@ Explicitly excluded for v1.0. Documented to prevent scope creep.
 
 ## Traceability
 
-Which phases cover which requirements. Populated during roadmap creation.
+All 23 v1 requirements mapped to phases. Confirmed during roadmap creation (2026-05-16).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
@@ -133,4 +133,4 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-16*
-*Last updated: 2026-05-16 after initial definition*
+*Last updated: 2026-05-16 after roadmap creation — all 23 requirements confirmed mapped, phase assignments verified*
