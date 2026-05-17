@@ -1,7 +1,8 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace LogViewer
 {
@@ -13,6 +14,12 @@ namespace LogViewer
     /// </summary>
     internal static class LogExporter
     {
+        private static readonly JsonSerializerOptions _jsonOptions = new()
+        {
+            WriteIndented = true,
+            Converters = { new JsonStringEnumConverter() },
+        };
+
         /// <summary>
         /// Serializes a collection of <see cref="LogEventArgs"/> as indented JSON.
         /// </summary>
@@ -21,7 +28,7 @@ namespace LogViewer
         {
             ArgumentNullException.ThrowIfNull(logEvents, paramName: nameof(logEvents));
 
-            return await Task.Run(() => new StringBuilder(JsonConvert.SerializeObject(logEvents, Formatting.Indented)));
+            return await Task.Run(() => new StringBuilder(JsonSerializer.Serialize(logEvents, _jsonOptions)));
         }
 
         /// <summary>

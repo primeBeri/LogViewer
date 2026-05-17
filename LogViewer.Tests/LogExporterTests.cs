@@ -4,7 +4,7 @@ using CsvHelper;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
 using Xunit;
 
 namespace LogViewer.Tests
@@ -61,13 +61,14 @@ namespace LogViewer.Tests
             var e = Make(level: LogLevel.Warning, handle: "Svc", message: "boom");
             var sb = await LogExporter.GetLogsAsJsonTextAsync(new[] { e });
 
-            var array = JArray.Parse(sb.ToString());
-            array.Count.Should().Be(1);
-            var token = array[0];
-            ((string?)token["LogHandle"]).Should().Be("Svc");
-            ((string?)token["LogText"]).Should().Be("boom");
-            // LogLevel serializes as int by default in Newtonsoft (3 == Warning).
-            ((int)token["LogLevel"]!).Should().Be((int)LogLevel.Warning);
+            using var doc = JsonDocument.Parse(sb.ToString());
+            var root = doc.RootElement;
+            root.GetArrayLength().Should().Be(1);
+            var token = root[0];
+            token.GetProperty("LogHandle").GetString().Should().Be("Svc");
+            token.GetProperty("LogText").GetString().Should().Be("boom");
+            // LogLevel serializes as string "Warning" with JsonStringEnumConverter.
+            token.GetProperty("LogLevel").GetString().Should().Be("Warning");
         }
 
         [Fact]
