@@ -41,10 +41,10 @@ All requirements below target the v1.0.0 public NuGet release. Requirements are 
 
 ### Testability (TEST)
 
-- [ ] **TEST-01**: `LogControlViewModel` instance-level tests exercise pause (`IsPaused`) toggle — events are buffered when paused, flushed when resumed
-- [ ] **TEST-02**: `LogControlViewModel` instance-level tests exercise handle filter and log-level filter updates including invalid regex handling
-- [ ] **TEST-03**: `LogControlViewModel` instance-level tests exercise `AddAndTrimLogEventsIfNeededAsync` — collection is trimmed to `MaxLogSize` when exceeded
-- [ ] **TEST-04**: `LogExporter` has dedicated unit tests verifying JSON, CSV, and plain-text output format for a known set of `LogEventArgs`
+- [x] **TEST-01**: `LogControlViewModel` instance-level tests exercise pause (`IsPaused`) toggle — events are buffered when paused, flushed when resumed
+- [x] **TEST-02**: `LogControlViewModel` instance-level tests exercise handle filter and log-level filter updates including invalid regex handling
+- [x] **TEST-03**: `LogControlViewModel` instance-level tests exercise `AddAndTrimLogEventsIfNeededAsync` — collection is trimmed to `MaxLogSize` when exceeded
+- [x] **TEST-04**: `LogExporter` has dedicated unit tests verifying JSON, CSV, and plain-text output format for a known set of `LogEventArgs`
 
 ### Package / Dependencies (PKG)
 
@@ -117,10 +117,10 @@ All 23 v1 requirements mapped to phases. Confirmed during roadmap creation (2026
 | STATE-02 | Phase 3 | Complete |
 | STATE-03 | Phase 3 | Complete |
 | STATE-04 | Phase 3 | Complete |
-| TEST-01 | Phase 3 | Pending |
-| TEST-02 | Phase 3 | Pending |
-| TEST-03 | Phase 3 | Pending |
-| TEST-04 | Phase 3 | Pending |
+| TEST-01 | Phase 3 | Complete |
+| TEST-02 | Phase 3 | Complete |
+| TEST-03 | Phase 3 | Complete |
+| TEST-04 | Phase 3 | Complete |
 | PKG-01 | Phase 4 | Pending |
 | PKG-02 | Phase 4 | Pending |
 | UI-01 | Phase 4 | Pending |
