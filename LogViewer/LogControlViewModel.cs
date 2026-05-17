@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using PropertyChanged;
@@ -23,7 +22,7 @@ namespace LogViewer
     [AddINotifyPropertyChangedInterface]
     public class LogControlViewModel : IDisposable
     {
-        private readonly Dispatcher _dispatcher;
+        private readonly IDispatcher _dispatcher;
         private readonly IBaseLoggerSink _sink;
         private string _logHandleFilter = ".*";
         private bool _logHandleIgnoreCase;
@@ -268,11 +267,11 @@ namespace LogViewer
         /// <summary>
         /// Initializes a new instance of the <see cref="LogControlViewModel"/> class.
         /// </summary>
-        /// <param name="dispatcher">The WPF dispatcher for UI thread synchronization.</param>
+        /// <param name="dispatcher">The dispatcher abstraction for UI thread synchronization.</param>
         /// <param name="sink">Optional log viewer sink. Defaults to <see cref="BaseLoggerSink.Instance"/>.</param>
         /// <param name="logHandleFilter">Optional initial log handle filter.</param>
         /// <exception cref="ArgumentNullException">Thrown if dispatcher is null.</exception>
-        public LogControlViewModel(Dispatcher dispatcher, IBaseLoggerSink? sink = null, string? logHandleFilter = null)
+        public LogControlViewModel(IDispatcher dispatcher, IBaseLoggerSink? sink = null, string? logHandleFilter = null)
         {
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _sink = sink ?? BaseLoggerSink.Instance;
@@ -322,6 +321,7 @@ namespace LogViewer
                 {
                     if (IsPaused)
                     {
+                        if (_pauseBuffer.Count >= MaxLogSize) return;
                         _pauseBuffer.Add(e);
                         return;
                     }
