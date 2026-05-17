@@ -4,39 +4,40 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using LogViewer;
 
 namespace LogViewer.Converters
 {
     /// <summary>
-    /// Converts a <see cref="System.Windows.Media.Color"/> value to a <see cref="System.Windows.Media.SolidColorBrush"/> for WPF data binding scenarios.
+    /// Converts a <see cref="LogColor"/> value to a <see cref="System.Windows.Media.SolidColorBrush"/> for WPF data binding scenarios.
     /// </summary>
     /// <remarks>
-    /// This converter is used in XAML bindings to convert color values to brushes for UI elements.
+    /// This converter is used in XAML bindings to convert platform-neutral <see cref="LogColor"/> values to WPF brushes for UI elements.
     /// </remarks>
     public class ColorToBrushConverter : IValueConverter
     {
         /// <summary>
-        /// Converts a <see cref="System.Windows.Media.Color"/> to a <see cref="System.Windows.Media.SolidColorBrush"/>.
+        /// Converts a <see cref="LogColor"/> to a <see cref="System.Windows.Media.SolidColorBrush"/>.
         /// </summary>
-        /// <param name="value">The value produced by the binding source. Expected to be a <see cref="System.Windows.Media.Color"/>.</param>
+        /// <param name="value">The value produced by the binding source. Expected to be a <see cref="LogColor"/>.</param>
         /// <param name="targetType">The type of the binding target property.</param>
         /// <param name="parameter">Optional parameter to use in the converter (not used).</param>
         /// <param name="culture">The culture to use in the converter.</param>
         /// <returns>
         /// A <see cref="System.Windows.Media.SolidColorBrush"/> with the specified color,
-        /// or <see cref="System.Windows.Media.Brushes.Black"/> if the value is not a <see cref="System.Windows.Media.Color"/>.
+        /// or a black brush if the value is not a <see cref="LogColor"/>.
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is System.Windows.Media.Color color)
+            if (value is LogColor logColor)
             {
-                return new System.Windows.Media.SolidColorBrush(color);
+                return logColor.ToSolidColorBrush();
             }
-            return System.Windows.Media.Brushes.Black; // Default brush if not a Color
+            return LogColor.Black.ToSolidColorBrush();
         }
 
         /// <summary>
-        /// Not implemented. Conversion from <see cref="System.Windows.Media.Brush"/> back to <see cref="System.Windows.Media.Color"/> is not supported.
+        /// Not implemented. Conversion from <see cref="System.Windows.Media.Brush"/> back to <see cref="LogColor"/> is not supported.
         /// </summary>
         /// <param name="value">The value produced by the binding target (not used).</param>
         /// <param name="targetType">The type to convert to (not used).</param>
