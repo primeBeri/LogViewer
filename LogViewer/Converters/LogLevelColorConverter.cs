@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using LogViewer;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewer.Converters
@@ -18,6 +19,7 @@ namespace LogViewer.Converters
     {
         /// <summary>
         /// Converts a <see cref="LogLevel"/> to a <see cref="System.Windows.Media.SolidColorBrush"/> with a color representing the log level.
+        /// Uses <see cref="LogColor"/> values internally for platform-neutral color mapping.
         /// </summary>
         /// <param name="value">The value produced by the binding source. Expected to be a <see cref="LogLevel"/>.</param>
         /// <param name="targetType">The type of the binding target property.</param>
@@ -25,28 +27,28 @@ namespace LogViewer.Converters
         /// <param name="culture">The culture to use in the converter.</param>
         /// <returns>
         /// A <see cref="System.Windows.Media.SolidColorBrush"/> with a color mapped to the specified <see cref="LogLevel"/>.
-        /// Returns black if the value is not a <see cref="LogLevel"/>.
+        /// Returns a black brush if the value is not a <see cref="LogLevel"/>.
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            System.Windows.Media.Color color = System.Windows.Media.Colors.Black;
             if (value is LogLevel logLevel)
             {
-                 color = logLevel switch
+                LogColor logColor = logLevel switch
                 {
-                    LogLevel.Trace       => System.Windows.Media.Colors.Gray,
-                    LogLevel.Debug       => System.Windows.Media.Colors.Blue,
-                    LogLevel.Warning     => System.Windows.Media.Colors.Orange,
-                    LogLevel.Error       => System.Windows.Media.Colors.Red,
-                    LogLevel.Critical    => System.Windows.Media.Colors.DarkRed,
-                    _                    => System.Windows.Media.Colors.Black
+                    LogLevel.Trace    => LogColor.FromRgb(128, 128, 128),
+                    LogLevel.Debug    => LogColor.FromRgb(0, 0, 255),
+                    LogLevel.Warning  => LogColor.FromRgb(255, 165, 0),
+                    LogLevel.Error    => LogColor.FromRgb(255, 0, 0),
+                    LogLevel.Critical => LogColor.FromRgb(139, 0, 0),
+                    _                 => LogColor.Black
                 };
+                return logColor.ToSolidColorBrush();
             }
-            return new System.Windows.Media.SolidColorBrush(color);
+            return LogColor.Black.ToSolidColorBrush();
         }
 
         /// <summary>
-        /// Not implemented. Conversion from <see cref="System.Windows.Media.Brush"/> back to <see cref="LogLevel"/> is not supported.
+        /// Not implemented. Conversion from a brush back to <see cref="LogLevel"/> is not supported.
         /// </summary>
         /// <param name="value">The value produced by the binding target (not used).</param>
         /// <param name="targetType">The type to convert to (not used).</param>

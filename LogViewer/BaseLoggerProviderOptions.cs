@@ -1,4 +1,3 @@
-using System.Windows.Media;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewer
@@ -21,9 +20,9 @@ namespace LogViewer
         public LogLevel MinimumLevel { get; set; } = LogLevel.Trace;
 
         /// <summary>
-        /// Gets a dictionary mapping category names to colors for visual differentiation.
+        /// Gets a dictionary mapping category names to platform-neutral colors for visual differentiation.
         /// </summary>
-        public Dictionary<string, Color> CategoryColors { get; } = new(StringComparer.OrdinalIgnoreCase);
+        public Dictionary<string, LogColor> CategoryColors { get; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Gets or sets the date/time format string used for log timestamps.

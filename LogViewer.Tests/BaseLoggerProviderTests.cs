@@ -1,4 +1,3 @@
-using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.Logging;
@@ -56,7 +55,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var provider = new BaseLoggerProvider(_sink, null);
-            provider.SetCategoryColor("TestCategory", Colors.Blue);
+            provider.SetCategoryColor("TestCategory", LogColor.FromRgb(0, 0, 255));
 
             // Act
             var logger = provider.CreateLogger("TestCategory");
@@ -64,7 +63,7 @@ namespace LogViewer.Tests
 
             // Assert
             _sink.ReceivedEvents.Should().HaveCount(1);
-            _sink.ReceivedEvents[0].LogColor.Should().Be(Colors.Blue);
+            _sink.ReceivedEvents[0].LogColor.Should().Be(LogColor.FromRgb(0, 0, 255));
         }
 
         [Fact]
@@ -72,7 +71,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var provider = new BaseLoggerProvider(_sink, null);
-            provider.SetCategoryColor<BaseLoggerProviderTests>(Colors.Green);
+            provider.SetCategoryColor<BaseLoggerProviderTests>(LogColor.FromRgb(0, 128, 0));
 
             // Act
             var logger = provider.CreateLogger(nameof(BaseLoggerProviderTests));
@@ -80,7 +79,7 @@ namespace LogViewer.Tests
 
             // Assert
             _sink.ReceivedEvents.Should().HaveCount(1);
-            _sink.ReceivedEvents[0].LogColor.Should().Be(Colors.Green);
+            _sink.ReceivedEvents[0].LogColor.Should().Be(LogColor.FromRgb(0, 128, 0));
         }
 
         [Fact]
@@ -88,10 +87,10 @@ namespace LogViewer.Tests
         {
             // Arrange
             var provider = new BaseLoggerProvider(_sink, null);
-            var colors = new Dictionary<string, Color>
+            var colors = new Dictionary<string, LogColor>
             {
-                { "Category1", Colors.Red },
-                { "Category2", Colors.Blue }
+                { "Category1", LogColor.FromRgb(255, 0, 0) },
+                { "Category2", LogColor.FromRgb(0, 0, 255) }
             };
 
             // Act
@@ -103,8 +102,8 @@ namespace LogViewer.Tests
 
             // Assert
             _sink.ReceivedEvents.Should().HaveCount(2);
-            _sink.ReceivedEvents[0].LogColor.Should().Be(Colors.Red);
-            _sink.ReceivedEvents[1].LogColor.Should().Be(Colors.Blue);
+            _sink.ReceivedEvents[0].LogColor.Should().Be(LogColor.FromRgb(255, 0, 0));
+            _sink.ReceivedEvents[1].LogColor.Should().Be(LogColor.FromRgb(0, 0, 255));
         }
 
         [Fact]
@@ -119,7 +118,7 @@ namespace LogViewer.Tests
 
             // Assert
             _sink.ReceivedEvents.Should().HaveCount(1);
-            _sink.ReceivedEvents[0].LogColor.Should().Be(Colors.Black);
+            _sink.ReceivedEvents[0].LogColor.Should().Be(LogColor.Black);
         }
 
         [Fact]
@@ -156,9 +155,9 @@ namespace LogViewer.Tests
             var provider = new BaseLoggerProvider(_sink, null);
 
             // Act & Assert
-            var act1 = () => provider.SetCategoryColor(null!, Colors.Blue);
-            var act2 = () => provider.SetCategoryColor("", Colors.Blue);
-            var act3 = () => provider.SetCategoryColor("   ", Colors.Blue);
+            var act1 = () => provider.SetCategoryColor(null!, LogColor.FromRgb(0, 0, 255));
+            var act2 = () => provider.SetCategoryColor("", LogColor.FromRgb(0, 0, 255));
+            var act3 = () => provider.SetCategoryColor("   ", LogColor.FromRgb(0, 0, 255));
 
             act1.Should().Throw<ArgumentException>();
             act2.Should().Throw<ArgumentException>();

@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.Logging;
@@ -14,9 +13,9 @@ namespace LogViewer.Tests
             LogLevel level = LogLevel.Information,
             string handle = "TestHandle",
             string message = "Test message",
-            Color? color = null,
+            LogColor? color = null,
             DateTime? timestamp = null)
-            => new(level, handle, message, color ?? Colors.Black)
+            => new(level, handle, message, color ?? LogColor.Black)
             {
                 LogDateTime = timestamp ?? new DateTime(2026, 5, 4, 12, 30, 45, 678, DateTimeKind.Utc)
             };
@@ -86,9 +85,10 @@ namespace LogViewer.Tests
         [Fact]
         public void FormatLogMessage_SubstitutesColor()
         {
-            var e = Make(color: Colors.Red);
+            var redColor = LogColor.FromRgb(255, 0, 0);
+            var e = Make(color: redColor);
             string output = e.FormatLogMessage("{color}");
-            output.Should().Be(Colors.Red.ToString(CultureInfo.InvariantCulture));
+            output.Should().Be(redColor.ToString());
         }
 
         [Theory]

@@ -1,6 +1,5 @@
 using System.IO;
 using System.Windows;
-using System.Windows.Media;
 using LogViewer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -42,9 +41,9 @@ namespace LogViewerExample
                     options.MaxQueueSize = 10000;
 
                     // Configure category colors for different services
-                    options.CategoryColors["ExampleVM"] = Colors.DodgerBlue;
-                    options.CategoryColors["SomeObject"] = Colors.MediumPurple;
-                    options.CategoryColors["MainWindow"] = Colors.OrangeRed;
+                    options.CategoryColors["ExampleVM"] = LogColor.FromRgb(30, 144, 255);   // DodgerBlue
+                    options.CategoryColors["SomeObject"] = LogColor.FromRgb(147, 112, 219); // MediumPurple
+                    options.CategoryColors["MainWindow"] = LogColor.FromRgb(255, 69, 0);    // OrangeRed
                 });
             });
 

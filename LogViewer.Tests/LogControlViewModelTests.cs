@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.Logging;
@@ -54,7 +53,7 @@ namespace LogViewer.Tests
             // Fill buffer to capacity
             for (int i = 0; i < 5; i++)
             {
-                sink.Write(new LogEventArgs(LogLevel.Information, "handle", $"msg{i}", Colors.Black));
+                sink.Write(new LogEventArgs(LogLevel.Information, "handle", $"msg{i}", LogColor.Black));
             }
 
             // Allow async handler to run
@@ -62,7 +61,7 @@ namespace LogViewer.Tests
             int countAtCapacity = vm.PauseBufferCount;
 
             // Act — write one more beyond capacity
-            sink.Write(new LogEventArgs(LogLevel.Information, "handle", "overflow", Colors.Black));
+            sink.Write(new LogEventArgs(LogLevel.Information, "handle", "overflow", LogColor.Black));
             await Task.Delay(50);
 
             // Assert — count must not exceed MaxLogSize
@@ -80,7 +79,7 @@ namespace LogViewer.Tests
             vm.IsPaused = true;
 
             // Act — write fewer than MaxLogSize entries
-            sink.Write(new LogEventArgs(LogLevel.Information, "handle", "msg1", Colors.Black));
+            sink.Write(new LogEventArgs(LogLevel.Information, "handle", "msg1", LogColor.Black));
             await Task.Delay(50);
 
             // Assert — entry was added to the buffer

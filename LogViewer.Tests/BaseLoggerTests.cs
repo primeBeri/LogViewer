@@ -1,4 +1,3 @@
-using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var provider = CreateProvider();
-            var logger = new BaseLogger("TestCategory", Colors.Blue, _sink, null, provider);
+            var logger = new BaseLogger("TestCategory", LogColor.FromRgb(0, 0, 255), _sink, null, provider);
 
             // Act
             logger.LogInformation("Test message");
@@ -25,7 +24,7 @@ namespace LogViewer.Tests
             _sink.ReceivedEvents.Should().HaveCount(1);
             _sink.ReceivedEvents[0].LogHandle.Should().Be("TestCategory");
             _sink.ReceivedEvents[0].LogText.Should().Contain("Test message");
-            _sink.ReceivedEvents[0].LogColor.Should().Be(Colors.Blue);
+            _sink.ReceivedEvents[0].LogColor.Should().Be(LogColor.FromRgb(0, 0, 255));
         }
 
         [Fact]
@@ -35,7 +34,7 @@ namespace LogViewer.Tests
             var innerLogger = new Mock<ILogger>();
             innerLogger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
             var provider = CreateProvider();
-            var logger = new BaseLogger("TestCategory", Colors.Black, _sink, innerLogger.Object, provider);
+            var logger = new BaseLogger("TestCategory", LogColor.Black, _sink, innerLogger.Object, provider);
 
             // Act
             logger.LogWarning("Warning message");
@@ -55,7 +54,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var provider = CreateProvider();
-            var logger = new BaseLogger("TestCategory", Colors.Red, _sink, null, provider);
+            var logger = new BaseLogger("TestCategory", LogColor.FromRgb(255, 0, 0), _sink, null, provider);
             var exception = new InvalidOperationException("Test exception");
 
             // Act
@@ -72,7 +71,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var provider = CreateProvider();
-            var logger = new BaseLogger("Test", Colors.Black, _sink, null, provider);
+            var logger = new BaseLogger("Test", LogColor.Black, _sink, null, provider);
 
             // Act
             var scope = logger.BeginScope("test scope");
@@ -89,7 +88,7 @@ namespace LogViewer.Tests
             var mockDisposable = new Mock<IDisposable>();
             innerLogger.Setup(l => l.BeginScope(It.IsAny<string>())).Returns(mockDisposable.Object);
             var provider = CreateProvider();
-            var logger = new BaseLogger("Test", Colors.Black, _sink, innerLogger.Object, provider);
+            var logger = new BaseLogger("Test", LogColor.Black, _sink, innerLogger.Object, provider);
 
             // Act
             var scope = logger.BeginScope("test scope");
@@ -104,7 +103,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var provider = CreateProvider();
-            var logger = new BaseLogger("TestCategory", Colors.Black, _sink, null, provider);
+            var logger = new BaseLogger("TestCategory", LogColor.Black, _sink, null, provider);
 
             // Act
             logger.LogWarning("Warning message");
@@ -119,7 +118,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var provider = CreateProvider();
-            var logger = new BaseLogger("TestCategory", Colors.Black, _sink, null, provider);
+            var logger = new BaseLogger("TestCategory", LogColor.Black, _sink, null, provider);
             var beforeLog = DateTime.Now;
 
             // Act

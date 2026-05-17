@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Media;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewer
@@ -209,12 +208,12 @@ namespace LogViewer
         /// Creates a new logger instance with the specified handle, color, and log level.
         /// </summary>
         /// <param name="handle">The unique identifier for the logger. If <see langword="null"/>, a default handle is used.</param>
-        /// <param name="color">The color associated with the logger's output. If <see langword="null"/>, a default color is used.</param>
+        /// <param name="color">The platform-neutral color associated with the logger's output. If <see langword="null"/>, a default color is used.</param>
         /// <param name="logLevel">The minimum log level for the logger. Defaults to <see cref="LogLevel.Information"/>.</param>
         /// <returns>An <see cref="ILoggable"/> instance configured with the specified parameters.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the logger factory is not initialized. Ensure <c>Initialize()</c> is called before creating a
         /// logger.</exception>
-        public static ILogger CreateLogger(string? handle = null, Color? color = null, LogLevel logLevel = LogLevel.Information)
+        public static ILogger CreateLogger(string? handle = null, LogColor? color = null, LogLevel logLevel = LogLevel.Information)
         {
             if (LoggerFactory is null)
                 throw new InvalidOperationException("LoggerFactory is not initialized. Call Initialize() before creating a logger.");
@@ -225,12 +224,12 @@ namespace LogViewer
         /// Creates a logger instance for the specified type with optional color and log level settings.
         /// </summary>
         /// <typeparam name="T">The type for which the logger is being created. The logger will use the name of this type.</typeparam>
-        /// <param name="color">An optional color to associate with the logger output. If not specified, the default color is used.</param>
+        /// <param name="color">An optional platform-neutral color to associate with the logger output. If not specified, the default color is used.</param>
         /// <param name="logLevel">The minimum log level for the logger. Defaults to <see cref="LogLevel.Information"/>.</param>
         /// <returns>An <see cref="ILoggable"/> instance configured for the specified type.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the logger factory is not initialized. Ensure <c>Initialize()</c> is called before creating a
         /// logger.</exception>
-        public static ILogger CreateLogger<T>(Color? color = null, LogLevel logLevel = LogLevel.Information)
+        public static ILogger CreateLogger<T>(LogColor? color = null, LogLevel logLevel = LogLevel.Information)
         {
             if (LoggerFactory is null)
                 throw new InvalidOperationException("LoggerFactory is not initialized. Call Initialize() before creating a logger.");

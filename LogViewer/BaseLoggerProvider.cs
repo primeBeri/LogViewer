@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Windows.Media;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewer
@@ -16,7 +15,7 @@ namespace LogViewer
     public sealed class BaseLoggerProvider(IBaseLoggerSink sink, ILoggerFactory? innerFactory = null) : ILoggerProvider
     {
         private readonly ConcurrentDictionary<string, Lazy<BaseLogger>> _loggers = new(StringComparer.OrdinalIgnoreCase);
-        private readonly ConcurrentDictionary<string, Color> _categoryColors = new(StringComparer.OrdinalIgnoreCase);
+        private readonly ConcurrentDictionary<string, LogColor> _categoryColors = new(StringComparer.OrdinalIgnoreCase);
         private readonly IBaseLoggerSink _sink = sink ?? throw new ArgumentNullException(nameof(sink));
         private readonly ILoggerFactory? _innerFactory = innerFactory;
         private bool _disposed;
@@ -70,7 +69,7 @@ namespace LogViewer
                     }
 
                     var sanitizedName = BaseLogger.SanitizeHandle(typeName);
-                    var color = _categoryColors.TryGetValue(sanitizedName, out var c) ? c : Colors.Black;
+                    var color = _categoryColors.TryGetValue(sanitizedName, out var c) ? c : LogColor.Black;
                     var innerLogger = _innerFactory?.CreateLogger(name);
                     return new BaseLogger(sanitizedName, color, _sink, innerLogger, this);
                 }, LazyThreadSafetyMode.ExecutionAndPublication)
@@ -81,8 +80,8 @@ namespace LogViewer
         /// Sets the color associated with a specified category name.
         /// </summary>
         /// <param name="categoryName">The category name.</param>
-        /// <param name="color">The color to associate with the category.</param>
-        public void SetCategoryColor(string categoryName, Color color)
+        /// <param name="color">The platform-neutral color to associate with the category.</param>
+        public void SetCategoryColor(string categoryName, LogColor color)
         {
             if (string.IsNullOrWhiteSpace(categoryName))
                 throw new ArgumentException("Category name cannot be null or empty", nameof(categoryName));
@@ -94,8 +93,8 @@ namespace LogViewer
         /// Sets the color associated with a specific type's category.
         /// </summary>
         /// <typeparam name="T">The type whose name will be used as the category.</typeparam>
-        /// <param name="color">The color to associate with the category.</param>
-        public void SetCategoryColor<T>(Color color)
+        /// <param name="color">The platform-neutral color to associate with the category.</param>
+        public void SetCategoryColor<T>(LogColor color)
         {
             SetCategoryColor(typeof(T).Name, color);
         }
@@ -103,8 +102,8 @@ namespace LogViewer
         /// <summary>
         /// Sets colors for multiple categories at once.
         /// </summary>
-        /// <param name="colorMap">A dictionary mapping category names to colors.</param>
-        public void SetCategoryColors(IReadOnlyDictionary<string, Color> colorMap)
+        /// <param name="colorMap">A dictionary mapping category names to platform-neutral colors.</param>
+        public void SetCategoryColors(IReadOnlyDictionary<string, LogColor> colorMap)
         {
             if (colorMap is null) return;
 
