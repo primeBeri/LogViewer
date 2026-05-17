@@ -7,7 +7,7 @@ Four phases transform the current `net10.0-windows`-only library (score 67/100) 
 ## Phases
 
 - [x] **Phase 1: Critical Blockers** - Multi-target the library for net8/net10, fix the export bug, and correct CI
-- [ ] **Phase 2: Architecture Foundations** - Decouple WPF Color from core interfaces, add IDispatcher abstraction, cap pause buffer
+- [x] **Phase 2: Architecture Foundations** - Decouple WPF Color from core interfaces, add IDispatcher abstraction, cap pause buffer
 - [ ] **Phase 3: Global State Elimination** - Replace static BaseLogger settings with IOptions<LogViewerOptions>, mark inheritance pattern obsolete, add VM tests
 - [ ] **Phase 4: Polish and Dependencies** - Remove Newtonsoft.Json, implement or remove LogWindow, add theme support
 
@@ -44,9 +44,9 @@ Plans:
   4. Under sustained high-throughput logging while paused, the `_pauseBuffer` stops growing at `MaxLogSize` entries; memory usage is bounded
 **Plans**: 3 plans
 Plans:
-- [ ] 02-01-PLAN.md — Create LogColor struct and LogColorWpfExtensions (platform-neutral color type + WPF extension)
-- [ ] 02-02-PLAN.md — Create IDispatcher/WpfDispatcher, update LogControlViewModel and LogControl, fix BUG-02 pause buffer cap
-- [ ] 02-03-PLAN.md — Swap System.Windows.Media.Color for LogColor in ILoggable, LogEventArgs, BaseLogger, and XAML converters
+- [x] 02-01-PLAN.md — Create LogColor struct and LogColorWpfExtensions (platform-neutral color type + WPF extension)
+- [x] 02-02-PLAN.md — Create IDispatcher/WpfDispatcher, update LogControlViewModel and LogControl, fix BUG-02 pause buffer cap
+- [x] 02-03-PLAN.md — Swap System.Windows.Media.Color for LogColor in ILoggable, LogEventArgs, BaseLogger, and XAML converters
 **UI hint**: no
 
 ### Phase 3: Global State Elimination
@@ -79,6 +79,6 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Critical Blockers | 4/4 | Complete | 2026-05-17 |
-| 2. Architecture Foundations | 0/3 | Not started | - |
+| 2. Architecture Foundations | 3/3 | Complete | 2026-05-17 |
 | 3. Global State Elimination | 0/TBD | Not started | - |
 | 4. Polish and Dependencies | 0/TBD | Not started | - |
