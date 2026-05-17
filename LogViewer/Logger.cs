@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewer
@@ -16,7 +15,7 @@ namespace LogViewer
     /// <param name="handle"></param>
     /// <param name="color"></param>
     /// <param name="logLevel"></param>
-    internal sealed class Logger(string? handle = null, Color? color = null, LogLevel logLevel = LogLevel.Information) : BaseLogger(handle, color ?? Colors.Black, logLevel), ILoggable, ILogger
+    internal sealed class Logger(string? handle = null, LogColor? color = null, LogLevel logLevel = LogLevel.Information) : BaseLogger(handle, color ?? LogColor.Black, logLevel), ILoggable, ILogger
     {
     }
 }

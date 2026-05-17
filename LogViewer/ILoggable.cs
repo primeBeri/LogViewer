@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewer
@@ -21,9 +20,9 @@ namespace LogViewer
         /// </summary>
         string LogHandle { get; }
         /// <summary>
-        /// Gets or sets the color associated with this logger instance.
+        /// Gets or sets the platform-neutral color associated with this logger instance.
         /// </summary>
-        Color LogColor { get; set; }
+        LogColor LogColor { get; set; }
 
         /// <summary>
         /// Gets the underlying <see cref="ILogger"/> instance used for logging.

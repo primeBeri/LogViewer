@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewer
@@ -96,10 +95,10 @@ namespace LogViewer
         /// Initializes a new instance of the <see cref="BaseLogger"/> class.
         /// </summary>
         /// <param name="handle">Optional log handle (name) for this logger. If null, the type name is used.</param>
-        /// <param name="color">Optional color to associate with this logger. Defaults to black.</param>
+        /// <param name="color">Optional platform-neutral color to associate with this logger. Defaults to black.</param>
         /// <param name="logLevel">The minimum <see cref="LogLevel"/> for this logger. Defaults to Information.</param>
         /// <exception cref="InvalidOperationException">Thrown if <c>LoggerFactory</c> is not initialized before instantiation.</exception>
-        protected BaseLogger(string? handle = null, Color? color = null, LogLevel logLevel = LogLevel.Information)
+        protected BaseLogger(string? handle = null, LogColor? color = null, LogLevel logLevel = LogLevel.Information)
         {
             if (LoggerFactory is null) throw new InvalidOperationException($"Must call {nameof(BaseLogger)}.{nameof(Initialize)} before creating an instance of {nameof(BaseLogger)}");
 
@@ -109,7 +108,7 @@ namespace LogViewer
             // sanitize the handle by removing unwanted characters and trimming whitespace
             // consumers of the code should be setting any characters they want to exclude in the static property BaseLogger.ExcludeCharsFromHandle
             LogHandle = SanitizeHandle(handle ?? GetType().Name);
-            LogColor = color ?? Colors.Black;
+            LogColor = color ?? LogColor.Black;
             LogLevel = logLevel;
 
             // create the logger using the sanitized handle
@@ -121,13 +120,13 @@ namespace LogViewer
         /// Used by <see cref="BaseLoggerProvider"/> to create logger instances.
         /// </summary>
         /// <param name="categoryName">The category name for this logger.</param>
-        /// <param name="color">The color to associate with log entries from this logger.</param>
+        /// <param name="color">The platform-neutral color to associate with log entries from this logger.</param>
         /// <param name="sink">The sink to write log events to.</param>
         /// <param name="innerLogger">Optional inner logger to pass through log calls to.</param>
         /// <param name="provider">The provider that created this logger.</param>
         internal BaseLogger(
             string categoryName,
-            Color color,
+            LogColor color,
             IBaseLoggerSink sink,
             ILogger? innerLogger,
             BaseLoggerProvider provider)
@@ -153,9 +152,9 @@ namespace LogViewer
         /// </summary>
         public string LogHandle { get; }
         /// <summary>
-        /// Gets or sets the color associated with this logger instance.
+        /// Gets or sets the platform-neutral color associated with this logger instance.
         /// </summary>
-        public Color LogColor { get; set; }
+        public LogColor LogColor { get; set; }
         /// <summary>
         /// Gets the underlying <see cref="ILogger"/> instance used for logging.
         /// May be null in DI mode when no inner logger is provided.

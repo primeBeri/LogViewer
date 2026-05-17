@@ -6,7 +6,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -19,9 +18,9 @@ namespace LogViewer
     /// <param name="level">The severity level of the log event.</param>
     /// <param name="logHandle">The handle (name) of the logger that generated the event.</param>
     /// <param name="message">The log message text.</param>
-    /// <param name="color">The color associated with the logger or log event.</param>
+    /// <param name="color">The platform-neutral color associated with the logger or log event.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="logHandle"/> or <paramref name="message"/> is null.</exception>
-    public class LogEventArgs(LogLevel level, string logHandle, string message, Color color) : EventArgs, IEquatable<LogEventArgs>
+    public class LogEventArgs(LogLevel level, string logHandle, string message, LogColor color) : EventArgs, IEquatable<LogEventArgs>
     {
         /// <summary>
         /// Gets the handle (name) of the logger that generated this event.
@@ -29,9 +28,9 @@ namespace LogViewer
         public string LogHandle { get; } = logHandle ?? throw new ArgumentNullException(nameof(logHandle));
 
         /// <summary>
-        /// Gets the color associated with this log event.
+        /// Gets the platform-neutral color associated with this log event.
         /// </summary>
-        public Color LogColor { get; } = color;
+        public LogColor LogColor { get; } = color;
 
         /// <summary>
         /// Gets the log message text.
@@ -100,7 +99,7 @@ namespace LogViewer
                 "timestamp" => LogDateTimeFormatted,
                 "loglevel"  => LogLevel.ToString(),
                 "threadid"  => ThreadId.ToString(CultureInfo.InvariantCulture),
-                "color"     => LogColor.ToString(CultureInfo.InvariantCulture),
+                "color"     => LogColor.ToString(),
                 "handle"    => LogHandle,
                 "message"   => LogText,
                 _           => match.Value
