@@ -1,4 +1,3 @@
-using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.DependencyInjection;
@@ -87,7 +86,7 @@ namespace LogViewer.Tests
             // Arrange - use a TestBaseLoggerSink to isolate this test
             var testSink = new TestBaseLoggerSink();
             var provider = new BaseLoggerProvider(testSink, null);
-            provider.SetCategoryColor("ColorTestCategory", Colors.Purple);
+            provider.SetCategoryColor("ColorTestCategory", LogColor.FromRgb(128, 0, 128));
 
             // Act
             var logger = provider.CreateLogger("ColorTestCategory");
@@ -95,7 +94,7 @@ namespace LogViewer.Tests
 
             // Assert
             testSink.ReceivedEvents.Should().HaveCount(1);
-            testSink.ReceivedEvents[0].LogColor.Should().Be(Colors.Purple);
+            testSink.ReceivedEvents[0].LogColor.Should().Be(LogColor.FromRgb(128, 0, 128));
         }
 
         [Fact]

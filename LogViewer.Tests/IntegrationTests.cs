@@ -1,4 +1,3 @@
-using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +15,7 @@ namespace LogViewer.Tests
             // Arrange
             var sink = new TestBaseLoggerSink();
             var provider = new BaseLoggerProvider(sink, null);
-            provider.SetCategoryColor("MyService", Colors.Blue);
+            provider.SetCategoryColor("MyService", LogColor.FromRgb(0, 0, 255));
 
             var loggerFactory = LoggerFactory.Create(builder =>
             {
@@ -33,7 +32,7 @@ namespace LogViewer.Tests
             sink.ReceivedEvents.Should().HaveCount(3);
             sink.ReceivedEvents[0].LogLevel.Should().Be(LogLevel.Information);
             sink.ReceivedEvents[0].LogText.Should().Contain("Hello, World!");
-            sink.ReceivedEvents[0].LogColor.Should().Be(Colors.Blue);
+            sink.ReceivedEvents[0].LogColor.Should().Be(LogColor.FromRgb(0, 0, 255));
 
             sink.ReceivedEvents[1].LogLevel.Should().Be(LogLevel.Warning);
             sink.ReceivedEvents[2].LogLevel.Should().Be(LogLevel.Error);
@@ -101,11 +100,11 @@ namespace LogViewer.Tests
             // Arrange
             var sink = new TestBaseLoggerSink();
             var provider = new BaseLoggerProvider(sink, null);
-            var colors = new Dictionary<string, Color>
+            var colors = new Dictionary<string, LogColor>
             {
-                { "ServiceA", Colors.Red },
-                { "ServiceB", Colors.Green },
-                { "ServiceC", Colors.Blue }
+                { "ServiceA", LogColor.FromRgb(255, 0, 0) },
+                { "ServiceB", LogColor.FromRgb(0, 128, 0) },
+                { "ServiceC", LogColor.FromRgb(0, 0, 255) }
             };
             provider.SetCategoryColors(colors);
 
@@ -122,17 +121,17 @@ namespace LogViewer.Tests
 
             // Assert
             sink.ReceivedEvents.Should().HaveCount(4);
-            sink.ReceivedEvents[0].LogColor.Should().Be(Colors.Red);
-            sink.ReceivedEvents[1].LogColor.Should().Be(Colors.Green);
-            sink.ReceivedEvents[2].LogColor.Should().Be(Colors.Blue);
-            sink.ReceivedEvents[3].LogColor.Should().Be(Colors.Black); // Default
+            sink.ReceivedEvents[0].LogColor.Should().Be(LogColor.FromRgb(255, 0, 0));
+            sink.ReceivedEvents[1].LogColor.Should().Be(LogColor.FromRgb(0, 128, 0));
+            sink.ReceivedEvents[2].LogColor.Should().Be(LogColor.FromRgb(0, 0, 255));
+            sink.ReceivedEvents[3].LogColor.Should().Be(LogColor.Black); // Default
         }
 
         [Fact]
         public void LogEventArgs_FormatsCorrectly()
         {
             // Arrange
-            var logEvent = new LogEventArgs(LogLevel.Information, "TestHandle", "Test message", Colors.Blue)
+            var logEvent = new LogEventArgs(LogLevel.Information, "TestHandle", "Test message", LogColor.FromRgb(0, 0, 255))
             {
                 LogDateTime = new DateTime(2024, 1, 15, 10, 30, 45, 123)
             };

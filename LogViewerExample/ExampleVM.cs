@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.Reflection;
-using System.Windows.Media;
 using LogViewer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -113,7 +112,7 @@ namespace LogViewerExample
 
                     for (int i = 0; i < 300; i++)
                     {
-                        Color randomColor = Color.FromArgb(255, (byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
+                        LogColor randomColor = LogColor.FromArgb(255, (byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256));
                         SomeObject obj = new($"SomeObject{i:D4}", randomColor, logLevels[random.Next(0, logLevels.Length)]);
                         _logGenerators.Add(obj.SomeAction(random, CancellationToken));
                     }

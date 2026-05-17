@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.IO;
-using System.Windows.Media;
 using CsvHelper;
 using FluentAssertions;
 using LogViewer;
@@ -17,9 +16,9 @@ namespace LogViewer.Tests
             LogLevel level = LogLevel.Information,
             string handle = "TestHandle",
             string message = "Test message",
-            Color? color = null,
+            LogColor? color = null,
             DateTime? timestamp = null)
-            => new(level, handle, message, color ?? Colors.Black)
+            => new(level, handle, message, color ?? LogColor.Black)
             {
                 LogDateTime = timestamp ?? new DateTime(2026, 5, 4, 12, 30, 45, 678, DateTimeKind.Utc)
             };

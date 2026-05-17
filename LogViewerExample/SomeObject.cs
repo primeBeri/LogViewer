@@ -1,5 +1,4 @@
-﻿using System.Windows.Media;
-using LogViewer;
+﻿using LogViewer;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewerExample
@@ -8,7 +7,7 @@ namespace LogViewerExample
     {
         private Action<string> LogMethod { get; }
 
-        public SomeObject(string name, Color? logColour = null, LogLevel desiredLogLevel = LogLevel.Information) : base(name, logColour ?? Colors.Black, desiredLogLevel)
+        public SomeObject(string name, LogColor? logColour = null, LogLevel desiredLogLevel = LogLevel.Information) : base(name, logColour ?? LogColor.Black, desiredLogLevel)
         {
             LogMethod = LogLevel switch
             {

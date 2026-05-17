@@ -1,4 +1,3 @@
-using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.Logging;
@@ -14,7 +13,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var sink = BaseLoggerSink.CreateForTesting();
-            var logEvent = new LogEventArgs(LogLevel.Information, "Test", "Test message", Colors.Black)
+            var logEvent = new LogEventArgs(LogLevel.Information, "Test", "Test message", LogColor.Black)
             {
                 LogDateTime = DateTime.Now
             };
@@ -33,7 +32,7 @@ namespace LogViewer.Tests
         {
             // Arrange
             var sink = BaseLoggerSink.CreateForTesting();
-            var logEvent = new LogEventArgs(LogLevel.Information, "Test", "Test message", Colors.Black)
+            var logEvent = new LogEventArgs(LogLevel.Information, "Test", "Test message", LogColor.Black)
             {
                 LogDateTime = DateTime.Now
             };
@@ -62,7 +61,7 @@ namespace LogViewer.Tests
             // Act - add more than max size
             for (int i = 0; i < 20; i++)
             {
-                var logEvent = new LogEventArgs(LogLevel.Information, "Test", $"Message {i}", Colors.Black)
+                var logEvent = new LogEventArgs(LogLevel.Information, "Test", $"Message {i}", LogColor.Black)
                 {
                     LogDateTime = DateTime.Now
                 };
@@ -131,7 +130,7 @@ namespace LogViewer.Tests
                             LogLevel.Information,
                             $"Thread{threadId}",
                             $"Message {j}",
-                            Colors.Black)
+                            LogColor.Black)
                         {
                             LogDateTime = DateTime.Now
                         };

@@ -1,6 +1,5 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
 using Microsoft.Extensions.Logging;
@@ -11,7 +10,7 @@ namespace LogViewer.Tests
     public class LogCollectionTests
     {
         private static LogEventArgs Make(string handle = "h", string text = "m")
-            => new(LogLevel.Information, handle, text, Colors.Black) { LogDateTime = DateTime.UtcNow };
+            => new(LogLevel.Information, handle, text, LogColor.Black) { LogDateTime = DateTime.UtcNow };
 
         private sealed class EventRecorder
         {
