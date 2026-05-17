@@ -53,8 +53,8 @@ All requirements below target the v1.0.0 public NuGet release. Requirements are 
 
 ### UI / UX (UI)
 
-- [ ] **UI-01**: `LogWindow` either hosts a functional `LogControl` (providing a standalone pop-out log window) or is removed from the package entirely — it must not ship as an empty `<Grid/>` shell
-- [ ] **UI-02**: `LogControl.xaml` background is no longer hardcoded as `White`; it uses `{DynamicResource {x:Static SystemColors.WindowBrushKey}}` (or an exposed `Background` dependency property) so the control inherits the host application's WPF theme
+- [x] **UI-01**: `LogWindow` either hosts a functional `LogControl` (providing a standalone pop-out log window) or is removed from the package entirely — it must not ship as an empty `<Grid/>` shell
+- [x] **UI-02**: `LogControl.xaml` background is no longer hardcoded as `White`; it uses `{DynamicResource {x:Static SystemColors.WindowBrushKey}}` (or an exposed `Background` dependency property) so the control inherits the host application's WPF theme
 
 ---
 
@@ -123,8 +123,8 @@ All 23 v1 requirements mapped to phases. Confirmed during roadmap creation (2026
 | TEST-04 | Phase 3 | Complete |
 | PKG-01 | Phase 4 | Pending |
 | PKG-02 | Phase 4 | Pending |
-| UI-01 | Phase 4 | Pending |
-| UI-02 | Phase 4 | Pending |
+| UI-01 | Phase 4 | Complete |
+| UI-02 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 23 total

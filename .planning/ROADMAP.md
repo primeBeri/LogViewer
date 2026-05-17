@@ -9,7 +9,7 @@ Four phases transform the current `net10.0-windows`-only library (score 67/100) 
 - [x] **Phase 1: Critical Blockers** - Multi-target the library for net8/net10, fix the export bug, and correct CI
 - [x] **Phase 2: Architecture Foundations** - Decouple WPF Color from core interfaces, add IDispatcher abstraction, cap pause buffer
 - [x] **Phase 3: Global State Elimination** - Replace static BaseLogger settings with IOptions<LogViewerOptions>, mark inheritance pattern obsolete, add VM tests (completed 2026-05-17)
-- [ ] **Phase 4: Polish and Dependencies** - Remove Newtonsoft.Json, implement or remove LogWindow, add theme support
+- [x] **Phase 4: Polish and Dependencies** - Remove Newtonsoft.Json, implement or remove LogWindow, add theme support (completed 2026-05-17)
 
 ## Phase Details
 
@@ -76,8 +76,8 @@ Plans:
   3. Embedding `LogControl` in a WPF application with a dark theme renders with a dark background; `Background="White"` is no longer hardcoded in `LogControl.xaml`
 **Plans**: 2 plans
 Plans:
-- [ ] 04-01-PLAN.md — Remove Newtonsoft.Json, migrate LogExporter to System.Text.Json, update LogExporterTests assertions
-- [ ] 04-02-PLAN.md — Embed LogControl in LogWindow.xaml; fix LogControl.xaml hardcoded white background
+- [x] 04-01-PLAN.md — Remove Newtonsoft.Json, migrate LogExporter to System.Text.Json, update LogExporterTests assertions
+- [x] 04-02-PLAN.md — Embed LogControl in LogWindow.xaml; fix LogControl.xaml hardcoded white background
 **UI hint**: yes
 
 ## Progress
@@ -87,4 +87,4 @@ Plans:
 | 1. Critical Blockers | 4/4 | Complete | 2026-05-17 |
 | 2. Architecture Foundations | 3/3 | Complete | 2026-05-17 |
 | 3. Global State Elimination | 2/2 | Complete   | 2026-05-17 |
-| 4. Polish and Dependencies | 0/2 | Planning complete | - |
+| 4. Polish and Dependencies | 2/2 | Complete   | 2026-05-17 |
