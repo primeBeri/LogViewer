@@ -42,7 +42,11 @@ Plans:
   2. A WPF extension method `LogColor.ToSolidColorBrush()` exists and is used by XAML converters so WPF rendering is unchanged
   3. `LogControlViewModel` accepts `IDispatcher` rather than `Dispatcher`; a test can instantiate it with a mock dispatcher without a WPF runtime
   4. Under sustained high-throughput logging while paused, the `_pauseBuffer` stops growing at `MaxLogSize` entries; memory usage is bounded
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 02-01-PLAN.md — Create LogColor struct and LogColorWpfExtensions (platform-neutral color type + WPF extension)
+- [ ] 02-02-PLAN.md — Create IDispatcher/WpfDispatcher, update LogControlViewModel and LogControl, fix BUG-02 pause buffer cap
+- [ ] 02-03-PLAN.md — Swap System.Windows.Media.Color for LogColor in ILoggable, LogEventArgs, BaseLogger, and XAML converters
 **UI hint**: no
 
 ### Phase 3: Global State Elimination
@@ -75,6 +79,6 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Critical Blockers | 4/4 | Complete | 2026-05-17 |
-| 2. Architecture Foundations | 0/TBD | Not started | - |
+| 2. Architecture Foundations | 0/3 | Not started | - |
 | 3. Global State Elimination | 0/TBD | Not started | - |
 | 4. Polish and Dependencies | 0/TBD | Not started | - |
