@@ -707,6 +707,7 @@ namespace LogViewer
                     subsection.Add(component);
                 }
             }
+            if (subsection.Count > 0) sections.Add([.. subsection]);
             return [.. sections];
         }
 

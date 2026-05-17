@@ -22,7 +22,11 @@ namespace LogViewer
         /// A <see cref="SolidColorBrush"/> whose color is constructed from the alpha, red, green,
         /// and blue channels of <paramref name="logColor"/>.
         /// </returns>
-        public static SolidColorBrush ToSolidColorBrush(this LogColor logColor) =>
-            new(Color.FromArgb(logColor.A, logColor.R, logColor.G, logColor.B));
+        public static SolidColorBrush ToSolidColorBrush(this LogColor logColor)
+        {
+            var brush = new SolidColorBrush(Color.FromArgb(logColor.A, logColor.R, logColor.G, logColor.B));
+            brush.Freeze();
+            return brush;
+        }
     }
 }

@@ -474,7 +474,10 @@ namespace LogViewer
         /// <param name="eventArgs">The event arguments to pass to subscribers.</param>
         protected void OnLogEvent(LogEventArgs eventArgs)
         {
-            _ = OnRaiseLogEventAsync(LogEvent, eventArgs);
+            _ = OnRaiseLogEventAsync(LogEvent, eventArgs)
+                    .ContinueWith(
+                        t => System.Diagnostics.Debug.WriteLine($"[BaseLogger] OnRaiseLogEventAsync faulted: {t.Exception}"),
+                        System.Threading.Tasks.TaskContinuationOptions.OnlyOnFaulted);
         }
 
         /// <summary>

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using LogViewer;
 using Microsoft.Extensions.Logging;
@@ -35,12 +31,13 @@ namespace LogViewer.Converters
             {
                 LogColor logColor = logLevel switch
                 {
-                    LogLevel.Trace    => LogColor.FromRgb(128, 128, 128),
-                    LogLevel.Debug    => LogColor.FromRgb(0, 0, 255),
-                    LogLevel.Warning  => LogColor.FromRgb(255, 165, 0),
-                    LogLevel.Error    => LogColor.FromRgb(255, 0, 0),
-                    LogLevel.Critical => LogColor.FromRgb(139, 0, 0),
-                    _                 => LogColor.Black
+                    LogLevel.Trace       => LogColor.FromRgb(128, 128, 128),
+                    LogLevel.Debug       => LogColor.FromRgb(0, 0, 255),
+                    LogLevel.Information => LogColor.Black,
+                    LogLevel.Warning     => LogColor.FromRgb(255, 165, 0),
+                    LogLevel.Error       => LogColor.FromRgb(255, 0, 0),
+                    LogLevel.Critical    => LogColor.FromRgb(139, 0, 0),
+                    _                    => LogColor.Black
                 };
                 return logColor.ToSolidColorBrush();
             }

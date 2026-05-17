@@ -181,7 +181,7 @@ namespace LogViewer
         /// <param name="exception">The exception to log.</param>
         /// <param name="headerMessage">A header message to prefix the exception details.</param>
         /// <param name="logLevel">The log level to use for the exception. Defaults to <see cref="LogLevel.Error"/>.</param>
-        void LogException(Exception exception, string headerMessage, LogLevel logLevel = LogLevel.Error);
+        void LogException(Exception exception, string? headerMessage, LogLevel logLevel = LogLevel.Error);
         /// <summary>
         /// Logs an exception at the <see cref="LogLevel.Error"/> level with no header message.
         /// </summary>

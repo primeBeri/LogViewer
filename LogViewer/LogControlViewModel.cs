@@ -321,7 +321,8 @@ namespace LogViewer
                 {
                     if (IsPaused)
                     {
-                        if (_pauseBuffer.Count >= MaxLogSize) return;
+                        int cap = MaxLogSize; // snapshot under lock — MaxLogSize can be written from UI thread
+                        if (_pauseBuffer.Count >= cap) return;
                         _pauseBuffer.Add(e);
                         return;
                     }

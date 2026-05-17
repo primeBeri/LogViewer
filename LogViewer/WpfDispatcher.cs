@@ -30,9 +30,11 @@ namespace LogViewer
         public T Invoke<T>(Func<T> callback) => _dispatcher.Invoke(callback);
 
         /// <inheritdoc/>
-        public async Task InvokeAsync(Action callback) => await _dispatcher.InvokeAsync(callback);
+        public Task InvokeAsync(Action callback) =>
+            _dispatcher.InvokeAsync(callback).Task;
 
         /// <inheritdoc/>
-        public async Task<T> InvokeAsync<T>(Func<T> callback) => await _dispatcher.InvokeAsync(callback);
+        public Task<T> InvokeAsync<T>(Func<T> callback) =>
+            _dispatcher.InvokeAsync(callback).Task;
     }
 }
