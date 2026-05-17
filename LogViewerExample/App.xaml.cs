@@ -38,7 +38,7 @@ namespace LogViewerExample
                 builder.AddLogViewer(options =>
                 {
                     options.MinimumLevel = Microsoft.Extensions.Logging.LogLevel.Trace;
-                    options.MaxQueueSize = 10000;
+                    options.MaxLogQueueSize = 10000;
 
                     // Configure category colors for different services
                     options.CategoryColors["ExampleVM"] = LogColor.FromRgb(30, 144, 255);   // DodgerBlue

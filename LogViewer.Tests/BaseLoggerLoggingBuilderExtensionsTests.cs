@@ -48,7 +48,7 @@ namespace LogViewer.Tests
             var services = new ServiceCollection();
             services.AddLogging(builder => builder.AddLogViewer(options =>
             {
-                options.MaxQueueSize = 5000;
+                options.MaxLogQueueSize = 5000;
             }));
 
             // Act
@@ -105,38 +105,31 @@ namespace LogViewer.Tests
             var customFormat = "HH:mm:ss";
             services.AddLogging(builder => builder.AddLogViewer(options =>
             {
-                options.DateTimeFormat = customFormat;
+                options.LogDateTimeFormat = customFormat;
             }));
 
             // Act
             services.BuildServiceProvider();
 
-            // Assert
-            BaseLogger.LogDateTimeFormat.Should().Be(customFormat);
-
-            // Cleanup - restore default
-            BaseLogger.LogDateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff (zzz)";
+            // Assert — DI path stores format on sink.Options, not on the static
+            BaseLoggerSink.Instance.Options?.LogDateTimeFormat.Should().Be(customFormat);
         }
 
         [Fact]
         public void AddLogViewer_WithUtcTime_AppliesUtcSetting()
         {
             // Arrange
-            var originalValue = BaseLogger.LogUTCTime;
             var services = new ServiceCollection();
             services.AddLogging(builder => builder.AddLogViewer(options =>
             {
-                options.UseUtcTime = true;
+                options.LogUTCTime = true;
             }));
 
             // Act
             services.BuildServiceProvider();
 
-            // Assert
-            BaseLogger.LogUTCTime.Should().BeTrue();
-
-            // Cleanup
-            BaseLogger.LogUTCTime = originalValue;
+            // Assert — DI path stores UTC flag on sink.Options, not on the static
+            BaseLoggerSink.Instance.Options?.LogUTCTime.Should().BeTrue();
         }
 
         [Fact]
@@ -159,7 +152,7 @@ namespace LogViewer.Tests
             var services = new ServiceCollection();
 
             // Act
-            var act = () => services.AddLogging(builder => builder.AddLogViewer((Action<BaseLoggerProviderOptions>)null!));
+            var act = () => services.AddLogging(builder => builder.AddLogViewer((Action<LogViewerOptions>)null!));
 
             // Assert
             act.Should().Throw<ArgumentNullException>();
