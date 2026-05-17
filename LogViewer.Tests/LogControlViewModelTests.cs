@@ -166,5 +166,98 @@ namespace LogViewer.Tests
             regex.IsMatch("FooBar").Should().BeFalse();
             regex.IsMatch("BarFoo").Should().BeFalse();
         }
+
+        // -------- TEST-01: Pause / Resume --------
+
+        [Fact]
+        public async Task PauseAndResume_FlushesBufferedEventsToLogEvents()
+        {
+            var sink = new TestBaseLoggerSink();
+            var vm = new LogControlViewModel(new FakeDispatcher(), sink);
+            vm.IsPaused = true;
+
+            sink.Write(new LogEventArgs(LogLevel.Information, "h", "m1", LogColor.Black));
+            sink.Write(new LogEventArgs(LogLevel.Information, "h", "m2", LogColor.Black));
+            sink.Write(new LogEventArgs(LogLevel.Information, "h", "m3", LogColor.Black));
+            await Task.Delay(50);
+
+            vm.LogEvents.Count.Should().Be(0);
+
+            vm.IsPaused = false;
+            await Task.Delay(50);
+
+            vm.LogEvents.Count.Should().Be(3);
+        }
+
+        // -------- TEST-02: Filters --------
+
+        [Fact]
+        public async Task HandleFilter_NonMatchingHandle_NotAddedToLogEvents()
+        {
+            var sink = new TestBaseLoggerSink();
+            var vm = new LogControlViewModel(new FakeDispatcher(), sink);
+            vm.LogHandleFilter = LogControlViewModel.WildcardToRegex("specific");
+
+            sink.Write(new LogEventArgs(LogLevel.Information, "other", "msg", LogColor.Black));
+            await Task.Delay(50);
+
+            vm.LogEvents.Count.Should().Be(0);
+        }
+
+        [Fact]
+        public async Task HandleFilter_MatchingHandle_AddedToLogEvents()
+        {
+            var sink = new TestBaseLoggerSink();
+            var vm = new LogControlViewModel(new FakeDispatcher(), sink);
+            vm.LogHandleFilter = LogControlViewModel.WildcardToRegex("specific");
+
+            sink.Write(new LogEventArgs(LogLevel.Information, "specific", "msg", LogColor.Black));
+            await Task.Delay(50);
+
+            vm.LogEvents.Count.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task LogLevelFilter_BelowMinimum_NotAddedToLogEvents()
+        {
+            var sink = new TestBaseLoggerSink();
+            var vm = new LogControlViewModel(new FakeDispatcher(), sink);
+            vm.LogLevel = LogLevel.Warning;
+
+            sink.Write(new LogEventArgs(LogLevel.Information, "h", "msg", LogColor.Black));
+            await Task.Delay(50);
+
+            vm.LogEvents.Count.Should().Be(0);
+        }
+
+        [Fact]
+        public void InvalidRegexFilter_ReturnsFalse_FilterUnchanged()
+        {
+            var sink = new TestBaseLoggerSink();
+            var vm = new LogControlViewModel(new FakeDispatcher(), sink);
+
+            var result = vm.SetRegexFilterIfValid("(?!");
+
+            result.Should().BeFalse();
+            vm.LogHandleFilter.Should().Be(".*");
+        }
+
+        // -------- TEST-03: Collection Trimming --------
+
+        [Fact]
+        public async Task AddLogs_ExceedingMaxLogSize_TrimsCollection()
+        {
+            var sink = new TestBaseLoggerSink();
+            var vm = new LogControlViewModel(new FakeDispatcher(), sink);
+            vm.MaxLogSize = 3;
+
+            for (int i = 0; i < 7; i++)
+            {
+                sink.Write(new LogEventArgs(LogLevel.Information, "h", $"msg{i}", LogColor.Black));
+            }
+            await Task.Delay(100);
+
+            vm.LogEvents.Count.Should().BeLessOrEqualTo(3);
+        }
     }
 }
