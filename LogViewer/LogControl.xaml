@@ -20,7 +20,7 @@
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterKey"/>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="White">
+    <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}">
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="42"/>
