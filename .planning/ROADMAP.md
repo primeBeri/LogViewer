@@ -6,7 +6,7 @@ Four phases transform the current `net10.0-windows`-only library (score 67/100) 
 
 ## Phases
 
-- [ ] **Phase 1: Critical Blockers** - Multi-target the library for net8/net10, fix the export bug, and correct CI
+- [x] **Phase 1: Critical Blockers** - Multi-target the library for net8/net10, fix the export bug, and correct CI
 - [ ] **Phase 2: Architecture Foundations** - Decouple WPF Color from core interfaces, add IDispatcher abstraction, cap pause buffer
 - [ ] **Phase 3: Global State Elimination** - Replace static BaseLogger settings with IOptions<LogViewerOptions>, mark inheritance pattern obsolete, add VM tests
 - [ ] **Phase 4: Polish and Dependencies** - Remove Newtonsoft.Json, implement or remove LogWindow, add theme support
@@ -74,7 +74,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Critical Blockers | 0/4 | Not started | - |
+| 1. Critical Blockers | 4/4 | Complete | 2026-05-17 |
 | 2. Architecture Foundations | 0/TBD | Not started | - |
 | 3. Global State Elimination | 0/TBD | Not started | - |
 | 4. Polish and Dependencies | 0/TBD | Not started | - |
