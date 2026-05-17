@@ -48,8 +48,8 @@ All requirements below target the v1.0.0 public NuGet release. Requirements are 
 
 ### Package / Dependencies (PKG)
 
-- [ ] **PKG-01**: `Newtonsoft.Json` is removed from `LogViewer.csproj` — no longer a transitive NuGet dependency for consumers
-- [ ] **PKG-02**: JSON export in `LogExporter` uses `System.Text.Json.JsonSerializer.Serialize` with appropriate `JsonSerializerOptions` (indented, enum strings)
+- [x] **PKG-01**: `Newtonsoft.Json` is removed from `LogViewer.csproj` — no longer a transitive NuGet dependency for consumers
+- [x] **PKG-02**: JSON export in `LogExporter` uses `System.Text.Json.JsonSerializer.Serialize` with appropriate `JsonSerializerOptions` (indented, enum strings)
 
 ### UI / UX (UI)
 
@@ -121,8 +121,8 @@ All 23 v1 requirements mapped to phases. Confirmed during roadmap creation (2026
 | TEST-02 | Phase 3 | Complete |
 | TEST-03 | Phase 3 | Complete |
 | TEST-04 | Phase 3 | Complete |
-| PKG-01 | Phase 4 | Pending |
-| PKG-02 | Phase 4 | Pending |
+| PKG-01 | Phase 4 | Complete |
+| PKG-02 | Phase 4 | Complete |
 | UI-01 | Phase 4 | Complete |
 | UI-02 | Phase 4 | Complete |
 
