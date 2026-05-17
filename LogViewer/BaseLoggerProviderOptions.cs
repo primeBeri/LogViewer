@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Logging;
 
 namespace LogViewer
@@ -5,6 +6,10 @@ namespace LogViewer
     /// <summary>
     /// Configuration options for LogViewer.
     /// </summary>
+    /// <remarks>
+    /// This type is obsolete. Use <see cref="LogViewerOptions"/> instead.
+    /// </remarks>
+    [Obsolete("Use LogViewerOptions instead. BaseLoggerProviderOptions will be removed in a future version.", false)]
     public class BaseLoggerProviderOptions
     {
         /// <summary>

@@ -234,7 +234,7 @@ namespace LogViewer
         /// <summary>
         /// Gets or sets the maximum number of log events to keep in the collection.
         /// </summary>
-        public int MaxLogSize { get; set; } = BaseLogger.MaxLogQueueSize;
+        public int MaxLogSize { get; set; }
 
         /// <summary>
         /// Gets or sets the format string used to display log entries. The format
@@ -275,6 +275,7 @@ namespace LogViewer
         {
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _sink = sink ?? BaseLoggerSink.Instance;
+            MaxLogSize = _sink.Options?.MaxLogQueueSize ?? BaseLogger.MaxLogQueueSize;
             LogEvents = new ReadOnlyLogCollection(_logEvents);
             LogHandleFilter = logHandleFilter ?? string.Empty;
             _logger = CreateLoggerIfNotDesignMode(); // will never be null except for in design mode, where logging is not needed.

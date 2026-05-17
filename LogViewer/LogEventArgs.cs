@@ -45,7 +45,9 @@ namespace LogViewer
         /// <summary>
         /// Gets the formatted timestamp string for display, using the global log date/time format.
         /// </summary>
-        [JsonIgnore] public string LogDateTimeFormatted => LogDateTime.ToString(BaseLogger.LogDateTimeFormat, CultureInfo.InvariantCulture);
+        [JsonIgnore] public string LogDateTimeFormatted => LogDateTime.ToString(
+            BaseLoggerSink.Instance.Options?.LogDateTimeFormat ?? BaseLogger.LogDateTimeFormat,
+            CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Gets the severity level of the log event.
@@ -70,7 +72,7 @@ namespace LogViewer
         /// <returns>A formatted string containing the timestamp, handle, and message.</returns>
         public override string ToString()
         {
-            return $"{LogDateTime.ToString(BaseLogger.LogDateTimeFormat, CultureInfo.InvariantCulture)} [{LogHandle}] {LogText}";
+            return $"{LogDateTime.ToString(BaseLoggerSink.Instance.Options?.LogDateTimeFormat ?? BaseLogger.LogDateTimeFormat, CultureInfo.InvariantCulture)} [{LogHandle}] {LogText}";
         }
 
         /// <summary>
@@ -92,7 +94,7 @@ namespace LogViewer
         /// values.</returns>
         public string FormatLogMessage(string? format = null)
         {
-            if (string.IsNullOrWhiteSpace(format)) format = BaseLogger.LogExportFormat;
+            if (string.IsNullOrWhiteSpace(format)) format = BaseLoggerSink.Instance.Options?.LogExportFormat ?? BaseLogger.LogExportFormat;
 
             return PlaceholderRegex.Replace(format, match => match.Groups[1].Value.ToLowerInvariant() switch
             {

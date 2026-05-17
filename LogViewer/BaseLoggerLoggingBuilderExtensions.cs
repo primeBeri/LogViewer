@@ -34,11 +34,11 @@ namespace LogViewer
         /// Adds LogViewer as a logging provider with configuration options.
         /// </summary>
         /// <param name="builder">The logging builder.</param>
-        /// <param name="configure">An action to configure <see cref="BaseLoggerProviderOptions"/>.</param>
+        /// <param name="configure">An action to configure <see cref="LogViewerOptions"/>.</param>
         /// <returns>The logging builder for chaining.</returns>
         public static ILoggingBuilder AddLogViewer(
             this ILoggingBuilder builder,
-            Action<BaseLoggerProviderOptions> configure)
+            Action<LogViewerOptions> configure)
             => AddLogViewerCore(builder, null, configure);
 
         /// <summary>
@@ -59,35 +59,36 @@ namespace LogViewer
         /// </summary>
         /// <param name="builder">The logging builder.</param>
         /// <param name="innerFactory">The factory to wrap (e.g., an NLog or Serilog factory).</param>
-        /// <param name="configure">An action to configure <see cref="BaseLoggerProviderOptions"/>.</param>
+        /// <param name="configure">An action to configure <see cref="LogViewerOptions"/>.</param>
         /// <returns>The logging builder for chaining.</returns>
         public static ILoggingBuilder AddLogViewer(
             this ILoggingBuilder builder,
             ILoggerFactory innerFactory,
-            Action<BaseLoggerProviderOptions> configure)
+            Action<LogViewerOptions> configure)
             => AddLogViewerCore(builder, innerFactory, configure);
 
         private static ILoggingBuilder AddLogViewerCore(
             ILoggingBuilder builder,
             ILoggerFactory? innerFactory,
-            Action<BaseLoggerProviderOptions> configure)
+            Action<LogViewerOptions> configure)
         {
             ArgumentNullException.ThrowIfNull(builder);
             ArgumentNullException.ThrowIfNull(configure);
 
-            var options = new BaseLoggerProviderOptions();
+            var options = new LogViewerOptions();
             configure(options);
-
-            // Apply global settings
-            BaseLogger.LogDateTimeFormat = options.DateTimeFormat;
-            BaseLogger.LogUTCTime = options.UseUtcTime;
 
             // Configure the singleton sink
             var sink = BaseLoggerSink.Instance;
-            sink.MaxQueueSize = options.MaxQueueSize;
+            sink.MaxQueueSize = options.MaxLogQueueSize;
+            sink.Options = options;
 
             // Register sink as singleton
             builder.Services.TryAddSingleton<IBaseLoggerSink>(sink);
+
+            // Register IOptions<LogViewerOptions> so consumers can inject or bind via appsettings.json
+            builder.Services.AddOptions();
+            builder.Services.Configure<LogViewerOptions>(o => configure(o));
 
             // Create and configure the provider
             var provider = new BaseLoggerProvider(sink, innerFactory)

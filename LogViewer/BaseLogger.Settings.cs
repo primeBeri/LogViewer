@@ -68,6 +68,7 @@ namespace LogViewer
         /// <param name="logDateTimeFormat">The date and time format string used for log entries. If not specified or empty, a default format of
         /// "yyyy-MM-dd HH:mm:ss.fff (zzz)" is used.</param>
         /// <param name="logExportFormat">The format used for exporting log entries. If not specified or empty, a default export format is used.</param>
+        [Obsolete("Use builder.AddLogViewer() with the DI pattern. See the migration guide in README.md.", false)]
         public static void Initialize(ILoggerFactory? loggerFactory, int maxLogQueueSize = 10000, string logDateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff (zzz)", string logExportFormat = DefaultLogExportFormat)
         {
             if (Initialized) return;
@@ -86,6 +87,7 @@ namespace LogViewer
         /// <para>After calling this method, the logging system is no longer initialized and cannot be
         /// used until reinitialized.</para>
         /// </remarks>
+        [Obsolete("Use builder.AddLogViewer() with the DI pattern. See the migration guide in README.md.", false)]
         public static void Shutdown()
         {
             if (!Initialized) return;
@@ -213,6 +215,7 @@ namespace LogViewer
         /// <returns>An <see cref="ILoggable"/> instance configured with the specified parameters.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the logger factory is not initialized. Ensure <c>Initialize()</c> is called before creating a
         /// logger.</exception>
+        [Obsolete("Use builder.AddLogViewer() with the DI pattern. See the migration guide in README.md.", false)]
         public static ILogger CreateLogger(string? handle = null, LogColor? color = null, LogLevel logLevel = LogLevel.Information)
         {
             if (LoggerFactory is null)
@@ -229,6 +232,7 @@ namespace LogViewer
         /// <returns>An <see cref="ILoggable"/> instance configured for the specified type.</returns>
         /// <exception cref="InvalidOperationException">Thrown if the logger factory is not initialized. Ensure <c>Initialize()</c> is called before creating a
         /// logger.</exception>
+        [Obsolete("Use builder.AddLogViewer() with the DI pattern. See the migration guide in README.md.", false)]
         public static ILogger CreateLogger<T>(LogColor? color = null, LogLevel logLevel = LogLevel.Information)
         {
             if (LoggerFactory is null)
