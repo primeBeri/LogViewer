@@ -1,17 +1,93 @@
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Windows.Media;
 using FluentAssertions;
 using LogViewer;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace LogViewer.Tests
 {
     /// <summary>
+    /// Minimal IDispatcher test double that always reports UI-thread access (CheckAccess returns true).
+    /// This avoids any actual dispatcher marshalling in unit tests.
+    /// </summary>
+    internal sealed class FakeDispatcher : IDispatcher
+    {
+        public bool CheckAccess() => true;
+        public T Invoke<T>(Func<T> callback) => callback();
+        public Task InvokeAsync(Action callback) { callback(); return Task.CompletedTask; }
+        public Task<T> InvokeAsync<T>(Func<T> callback) => Task.FromResult(callback());
+    }
+
+    /// <summary>
     /// Tests for the static helpers on <see cref="LogControlViewModel"/> that don't
-    /// require a Dispatcher. Instance-level VM tests are deferred to v0.4.0 where
-    /// the VM lifecycle changes (DataContext-injected) make testing straightforward.
+    /// require a WPF Dispatcher, plus instance-level tests unlocked by the IDispatcher abstraction.
     /// </summary>
     public class LogControlViewModelTests
     {
+        // -------- IDispatcher abstraction (ARCH-03) --------
+
+        [Fact]
+        public void Constructor_WithFakeDispatcher_DoesNotThrow()
+        {
+            // Arrange
+            var sink = new TestBaseLoggerSink();
+            var dispatcher = new FakeDispatcher();
+
+            // Act
+            var act = () => new LogControlViewModel(dispatcher, sink);
+
+            // Assert — must not throw; no WPF runtime required
+            act.Should().NotThrow();
+        }
+
+        [Fact]
+        public async Task PauseBuffer_WhenAtMaxLogSize_DoesNotAddNewEntry()
+        {
+            // Arrange
+            var sink = new TestBaseLoggerSink();
+            var vm = new LogControlViewModel(new FakeDispatcher(), sink);
+            vm.MaxLogSize = 5;
+            vm.IsPaused = true;
+
+            // Fill buffer to capacity
+            for (int i = 0; i < 5; i++)
+            {
+                sink.Write(new LogEventArgs(LogLevel.Information, "handle", $"msg{i}", Colors.Black));
+            }
+
+            // Allow async handler to run
+            await Task.Delay(50);
+            int countAtCapacity = vm.PauseBufferCount;
+
+            // Act — write one more beyond capacity
+            sink.Write(new LogEventArgs(LogLevel.Information, "handle", "overflow", Colors.Black));
+            await Task.Delay(50);
+
+            // Assert — count must not exceed MaxLogSize
+            vm.PauseBufferCount.Should().Be(countAtCapacity);
+            vm.PauseBufferCount.Should().BeLessOrEqualTo(vm.MaxLogSize);
+        }
+
+        [Fact]
+        public async Task PauseBuffer_WhenBelowMaxLogSize_AddsNewEntry()
+        {
+            // Arrange
+            var sink = new TestBaseLoggerSink();
+            var vm = new LogControlViewModel(new FakeDispatcher(), sink);
+            vm.MaxLogSize = 10;
+            vm.IsPaused = true;
+
+            // Act — write fewer than MaxLogSize entries
+            sink.Write(new LogEventArgs(LogLevel.Information, "handle", "msg1", Colors.Black));
+            await Task.Delay(50);
+
+            // Assert — entry was added to the buffer
+            vm.PauseBufferCount.Should().Be(1);
+        }
+
+
         // -------- WildcardToRegex --------
 
         [Theory]
