@@ -49,7 +49,7 @@ namespace LogViewer
         public LogControl()
         {
             InitializeComponent();
-            _viewModel = new LogControlViewModel(Dispatcher);
+            _viewModel = new LogControlViewModel(new WpfDispatcher(Dispatcher));
             this.DataContext = _viewModel;
 
             // Sync any XAML-set DP values into the VM. The changed-callbacks
