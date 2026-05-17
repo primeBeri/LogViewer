@@ -34,10 +34,10 @@ All requirements below target the v1.0.0 public NuGet release. Requirements are 
 
 ### Global State Elimination (STATE)
 
-- [ ] **STATE-01**: A `LogViewerOptions` POCO consolidates all shared configuration (`MaxLogQueueSize`, `LogDateTimeFormat`, `LogUTCTime`, `ExcludeCharsFromHandle`, category colour map) currently scattered across static properties on `BaseLogger.Settings.cs`
-- [ ] **STATE-02**: `LogViewerOptions` is registered as `IOptions<LogViewerOptions>` in the DI container via `AddLogViewer()` so consumers can configure it through `appsettings.json` or `Configure<LogViewerOptions>()`
-- [ ] **STATE-03**: `BaseLogger.Initialize()`, `BaseLogger.Shutdown()`, and the static inheritance-pattern factory methods are marked `[Obsolete("Use the DI pattern via builder.AddLogViewer(). See migration guide.")]`
-- [ ] **STATE-04**: All internal reads of static `BaseLogger.*` configuration properties in the DI code path are replaced by injected `IOptions<LogViewerOptions>`
+- [x] **STATE-01**: A `LogViewerOptions` POCO consolidates all shared configuration (`MaxLogQueueSize`, `LogDateTimeFormat`, `LogUTCTime`, `ExcludeCharsFromHandle`, category colour map) currently scattered across static properties on `BaseLogger.Settings.cs`
+- [x] **STATE-02**: `LogViewerOptions` is registered as `IOptions<LogViewerOptions>` in the DI container via `AddLogViewer()` so consumers can configure it through `appsettings.json` or `Configure<LogViewerOptions>()`
+- [x] **STATE-03**: `BaseLogger.Initialize()`, `BaseLogger.Shutdown()`, and the static inheritance-pattern factory methods are marked `[Obsolete("Use the DI pattern via builder.AddLogViewer(). See migration guide.")]`
+- [x] **STATE-04**: All internal reads of static `BaseLogger.*` configuration properties in the DI code path are replaced by injected `IOptions<LogViewerOptions>`
 
 ### Testability (TEST)
 
@@ -113,10 +113,10 @@ All 23 v1 requirements mapped to phases. Confirmed during roadmap creation (2026
 | ARCH-03 | Phase 2 | Pending |
 | ARCH-04 | Phase 2 | Pending |
 | BUG-02 | Phase 2 | Pending |
-| STATE-01 | Phase 3 | Pending |
-| STATE-02 | Phase 3 | Pending |
-| STATE-03 | Phase 3 | Pending |
-| STATE-04 | Phase 3 | Pending |
+| STATE-01 | Phase 3 | Complete |
+| STATE-02 | Phase 3 | Complete |
+| STATE-03 | Phase 3 | Complete |
+| STATE-04 | Phase 3 | Complete |
 | TEST-01 | Phase 3 | Pending |
 | TEST-02 | Phase 3 | Pending |
 | TEST-03 | Phase 3 | Pending |
@@ -133,4 +133,4 @@ All 23 v1 requirements mapped to phases. Confirmed during roadmap creation (2026
 
 ---
 *Requirements defined: 2026-05-16*
-*Last updated: 2026-05-16 after roadmap creation — all 23 requirements confirmed mapped, phase assignments verified*
+*Last updated: 2026-05-17 after 03-01 execution — STATE-01 through STATE-04 marked complete*

@@ -4,8 +4,8 @@ milestone: v1.0.0
 milestone_name: milestone
 status: executing
 stopped_at: null
-last_updated: "2026-05-17T00:00:00.000Z"
-last_activity: 2026-05-17 — Phase 3 planned; 2 plans created (03-01 and 03-02); ready to execute
+last_updated: "2026-05-17T19:61:46Z"
+last_activity: 2026-05-17 — Phase 3 Plan 01 executed: LogViewerOptions created, IOptions<LogViewerOptions> registered, static mutations removed, Obsolete markers added; 125/125 tests passing
 progress:
   total_phases: 4
   completed_phases: 2
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-05-16)
 ## Current Position
 
 Phase: 3 of 4 (Global State Elimination)
-Plan: 0 of 2 in current phase
-Status: Phase 3 planning complete — ready to execute
-Last activity: 2026-05-17 — Phase 2 complete; LogColor struct, IDispatcher/WpfDispatcher, BUG-02 fixed; 125/125 tests passing. Phase 3 planned: 03-01-PLAN.md (DI wiring + Obsolete markers, Wave 1) and 03-02-PLAN.md (ViewModel + exporter tests, Wave 2).
+Plan: 1 of 2 in current phase
+Status: Phase 3 Plan 01 complete — 03-02 (ViewModel + exporter tests) ready to execute
+Last activity: 2026-05-17 — Phase 3 Plan 01 complete; LogViewerOptions, IOptions registration, static mutations removed, Obsolete markers; 125/125 tests passing.
 
-Progress: [██████░░░░] 50%
+Progress: [███████░░░] 56%
 
 ## Performance Metrics
 
@@ -67,6 +67,8 @@ Recent decisions affecting current work:
 - (Phase 3 planning): IBaseLoggerSink.Options is LogViewerOptions? nullable — null means inheritance pattern (statics used as fallback); non-null means DI path
 - (Phase 3 planning): LogEventArgs reads format from BaseLoggerSink.Instance.Options with static fallback — best-effort approach that avoids threading LogViewerOptions through every log event constructor
 - (Phase 3 planning): TEST-04 confirmed satisfied by existing Text_NullFormat_FallsBackToBaseLoggerExportFormat test in LogExporterTests.cs — no gap
+- (03-01): LogViewerOptions uses renamed properties (MaxLogQueueSize, LogDateTimeFormat, LogUTCTime) aligned with BaseLogger static names
+- (03-01): Tests for DateTimeFormat/UtcTime assert sink.Options (not statics) since DI path no longer mutates statics
 
 ### Pending Todos
 
@@ -89,5 +91,5 @@ None. Phase 2's IDispatcher abstraction is in place; TEST-01 through TEST-03 can
 ## Session Continuity
 
 Last session: 2026-05-17
-Stopped at: Phase 3 planning complete
+Stopped at: Phase 3, Plan 01 complete — ready for 03-02
 Resume file: None

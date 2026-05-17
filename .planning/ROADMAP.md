@@ -61,7 +61,7 @@ Plans:
   4. The test suite includes `LogControlViewModel` instance-level tests for pause/resume buffer flushing, handle and level filter updates, collection trimming, and `LogExporter` output format — and all pass without a WPF runtime
 **Plans**: 2 plans
 Plans:
-- [ ] 03-01-PLAN.md — Create LogViewerOptions, wire IOptions into AddLogViewer, remove static mutations, mark Obsolete entry points
+- [x] 03-01-PLAN.md — Create LogViewerOptions, wire IOptions into AddLogViewer, remove static mutations, mark Obsolete entry points
 - [ ] 03-02-PLAN.md — Add LogControlViewModel instance tests for TEST-01/02/03; confirm TEST-04 coverage
 **UI hint**: no
 
@@ -83,5 +83,5 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Critical Blockers | 4/4 | Complete | 2026-05-17 |
 | 2. Architecture Foundations | 3/3 | Complete | 2026-05-17 |
-| 3. Global State Elimination | 0/2 | Planning complete | - |
+| 3. Global State Elimination | 1/2 | In progress | - |
 | 4. Polish and Dependencies | 0/TBD | Not started | - |
