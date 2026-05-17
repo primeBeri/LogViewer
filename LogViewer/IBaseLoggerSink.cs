@@ -29,5 +29,11 @@ namespace LogViewer
         /// Gets the internal log queue for access by LogControl.
         /// </summary>
         ConcurrentQueue<LogEventArgs> LogQueue { get; }
+
+        /// <summary>
+        /// Gets or sets the active <see cref="LogViewerOptions"/> injected by <c>AddLogViewer()</c>.
+        /// <see langword="null"/> when using the inheritance pattern; consumers read statics as fallback in that case.
+        /// </summary>
+        LogViewerOptions? Options { get; set; }
     }
 }

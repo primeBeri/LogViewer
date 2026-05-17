@@ -12,6 +12,7 @@ namespace LogViewer.Tests
         public event LogEvent? LogReceived;
         public int MaxQueueSize { get; set; } = 1000;
         public ConcurrentQueue<LogEventArgs> LogQueue { get; } = new();
+        public LogViewerOptions? Options { get; set; }
 
         public void Write(LogEventArgs logEvent)
         {

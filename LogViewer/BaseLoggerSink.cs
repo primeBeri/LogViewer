@@ -37,6 +37,9 @@ namespace LogViewer
         /// <inheritdoc />
         public int MaxQueueSize { get; set; } = 10000;
 
+        /// <inheritdoc />
+        public LogViewerOptions? Options { get; set; }
+
         private BaseLoggerSink() { }
 
         /// <summary>
