@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3, Plan 01 complete — ready for 03-02
-last_updated: "2026-05-17T20:06:57.032Z"
-last_activity: 2026-05-17
+stopped_at: Phase 4 planned — ready to execute
+last_updated: "2026-05-17T22:00:00.000Z"
+last_activity: 2026-05-17 — Phase 4 planned; 2 plans in Wave 1 ready to execute
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 9
+  total_plans: 11
   completed_plans: 9
-  percent: 75
+  percent: 82
 ---
 
 # Project State
@@ -21,22 +21,28 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** A plug-and-play WPF log viewer that any .NET 8 or .NET 10 application can embed via NuGet with a single `AddLogViewer()` call and a `<LogControl />` element — no boilerplate, no friction.
-**Current focus:** Phase 3 — Global State Elimination
+**Current focus:** Phase 4 — Polish and Dependencies (executing)
 
 ## Current Position
 
-Phase: 3 of 4 (Global State Elimination)
-Plan: 2 of 2 in current phase
-Status: Ready to execute
-Last activity: 2026-05-17
+Phase: 4 of 4 (Polish and Dependencies)
+Plan: 0 of 2 in current phase
+Status: Plans created — ready to execute Wave 1
+Last activity: 2026-05-17 — Phase 4 planning complete; 131/131 tests passing from Phase 3
 
-Progress: [██████████] 100%
+Progress: [█████████░] 82%
+
+## Wave Structure
+
+| Wave | Plans | Files | Autonomous |
+|------|-------|-------|------------|
+| 1 (parallel) | 04-01 (PKG), 04-02 (UI) | No overlap | 04-01: yes / 04-02: no (human-verify checkpoint) |
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 7
+- Total plans completed: 9
 - Average duration: ~7 min/plan
 - Total execution time: ~8 min (parallel wave)
 
@@ -46,10 +52,11 @@ Progress: [██████████] 100%
 |-------|-------|-------|----------|
 | 1: Critical Blockers | 4 | ~8 min | ~7 min |
 | 2: Architecture Foundations | 3 | — | — |
+| 3: Global State Elimination | 2 | — | — |
 
 **Recent Trend:**
 
-- Last 5 plans: 02-01, 02-02, 02-03 (Phase 2 complete); Phase 3 planning done
+- Last completed: Phase 3 (03-01, 03-02)
 - Trend: On track
 
 *Updated after each plan completion*
@@ -69,6 +76,10 @@ Recent decisions affecting current work:
 - (Phase 3 planning): TEST-04 confirmed satisfied by existing Text_NullFormat_FallsBackToBaseLoggerExportFormat test in LogExporterTests.cs — no gap
 - (03-01): LogViewerOptions uses renamed properties (MaxLogQueueSize, LogDateTimeFormat, LogUTCTime) aligned with BaseLogger static names
 - (03-01): Tests for DateTimeFormat/UtcTime assert sink.Options (not statics) since DI path no longer mutates statics
+- (Phase 4 planning): System.Text.Json used as Newtonsoft.Json replacement — inbox .NET runtime library, zero additional dependencies
+- (Phase 4 planning): LogColor JSON format changes from Newtonsoft string "#FFFFAA00" to STJ object {"A":255,"R":255,"G":170,"B":0} — acceptable; no test asserts LogColor JSON shape
+- (Phase 4 planning): LogWindow implements UI-01 by embedding LogControl (not by removal) — simpler, keeps the public API surface
+- (Phase 4 planning): LogControl background uses DynamicResource (not StaticResource) so it adapts if the host app changes theme at runtime
 
 ### Pending Todos
 
@@ -76,7 +87,7 @@ None.
 
 ### Blockers/Concerns
 
-None. Phase 2's IDispatcher abstraction is in place; TEST-01 through TEST-03 can now be written (dependency correctly resolved).
+None.
 
 ## Deferred Items
 
@@ -90,6 +101,6 @@ None. Phase 2's IDispatcher abstraction is in place; TEST-01 through TEST-03 can
 
 ## Session Continuity
 
-Last session: 2026-05-17T20:06:57.026Z
-Stopped at: Phase 3, Plan 01 complete — ready for 03-02
+Last session: 2026-05-17T22:00:00.000Z
+Stopped at: Phase 4 planning complete — ready for `/gsd:execute-phase 4`
 Resume file: None

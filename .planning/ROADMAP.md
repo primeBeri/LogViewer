@@ -74,7 +74,10 @@ Plans:
   1. `Newtonsoft.Json` does not appear in the package's dependency graph; JSON export uses `System.Text.Json.JsonSerializer` and produces equivalent output
   2. `LogWindow` either hosts a working `LogControl` (a consumer can call `new LogWindow().Show()` and see the log viewer) or is absent from the package entirely — it does not ship as an empty `<Grid/>` shell
   3. Embedding `LogControl` in a WPF application with a dark theme renders with a dark background; `Background="White"` is no longer hardcoded in `LogControl.xaml`
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04-01-PLAN.md — Remove Newtonsoft.Json, migrate LogExporter to System.Text.Json, update LogExporterTests assertions
+- [ ] 04-02-PLAN.md — Embed LogControl in LogWindow.xaml; fix LogControl.xaml hardcoded white background
 **UI hint**: yes
 
 ## Progress
@@ -84,4 +87,4 @@ Plans:
 | 1. Critical Blockers | 4/4 | Complete | 2026-05-17 |
 | 2. Architecture Foundations | 3/3 | Complete | 2026-05-17 |
 | 3. Global State Elimination | 2/2 | Complete   | 2026-05-17 |
-| 4. Polish and Dependencies | 0/TBD | Not started | - |
+| 4. Polish and Dependencies | 0/2 | Planning complete | - |
