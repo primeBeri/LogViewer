@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: context exhaustion at 76% (2026-05-16)
-last_updated: "2026-05-16T19:55:06.277Z"
-last_activity: 2026-05-16 — Phase 1 Wave 1 executed; all 4 plans complete; 114 tests passing
+stopped_at: null
+last_updated: "2026-05-17T00:00:00.000Z"
+last_activity: 2026-05-17 — Phase 3 planned; 2 plans created (03-01 and 03-02); ready to execute
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_phases: 2
+  total_plans: 9
+  completed_plans: 7
+  percent: 50
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-16)
 
 **Core value:** A plug-and-play WPF log viewer that any .NET 8 or .NET 10 application can embed via NuGet with a single `AddLogViewer()` call and a `<LogControl />` element — no boilerplate, no friction.
-**Current focus:** Phase 1 — Critical Blockers
+**Current focus:** Phase 3 — Global State Elimination
 
 ## Current Position
 
 Phase: 3 of 4 (Global State Elimination)
-Plan: 0 of TBD in current phase
-Status: Ready for Phase 3
-Last activity: 2026-05-17 — Phase 2 complete; LogColor struct, IDispatcher/WpfDispatcher, BUG-02 fixed; 125/125 tests passing
+Plan: 0 of 2 in current phase
+Status: Phase 3 planning complete — ready to execute
+Last activity: 2026-05-17 — Phase 2 complete; LogColor struct, IDispatcher/WpfDispatcher, BUG-02 fixed; 125/125 tests passing. Phase 3 planned: 03-01-PLAN.md (DI wiring + Obsolete markers, Wave 1) and 03-02-PLAN.md (ViewModel + exporter tests, Wave 2).
 
 Progress: [██████░░░░] 50%
 
@@ -36,7 +36,7 @@ Progress: [██████░░░░] 50%
 
 **Velocity:**
 
-- Total plans completed: 4
+- Total plans completed: 7
 - Average duration: ~7 min/plan
 - Total execution time: ~8 min (parallel wave)
 
@@ -45,10 +45,11 @@ Progress: [██████░░░░] 50%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1: Critical Blockers | 4 | ~8 min | ~7 min |
+| 2: Architecture Foundations | 3 | — | — |
 
 **Recent Trend:**
 
-- Last 5 plans: 01-01 (~8 min), 01-02 (~2 min), 01-03 (~2 min), 01-04 (~2 min)
+- Last 5 plans: 02-01, 02-02, 02-03 (Phase 2 complete); Phase 3 planning done
 - Trend: On track
 
 *Updated after each plan completion*
@@ -62,14 +63,18 @@ Recent decisions affecting current work:
 
 - (Roadmap): Multi-target `net8.0-windows;net10.0-windows` chosen over lowering to net8 only — keeps .NET 10 API access while enabling .NET 8 consumers immediately
 - (Roadmap): All breaking changes (Color removal, global state, inheritance deprecation) bundled into single v1.0.0 — avoids repeated semver major bumps on a pre-release library
+- (Phase 3 planning): BaseLoggerProviderOptions marked [Obsolete] rather than deleted — gives consumers a CS0618 warning without a compile error; safe pre-v1.0
+- (Phase 3 planning): IBaseLoggerSink.Options is LogViewerOptions? nullable — null means inheritance pattern (statics used as fallback); non-null means DI path
+- (Phase 3 planning): LogEventArgs reads format from BaseLoggerSink.Instance.Options with static fallback — best-effort approach that avoids threading LogViewerOptions through every log event constructor
+- (Phase 3 planning): TEST-04 confirmed satisfied by existing Text_NullFormat_FallsBackToBaseLoggerExportFormat test in LogExporterTests.cs — no gap
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- Phase 2 depends on `IDispatcher` abstraction being in place before `LogControlViewModel` tests can be written (TEST-01 through TEST-03 are in Phase 3 but require Phase 2's ARCH-03/04 to be complete first — dependency is correctly ordered)
+None. Phase 2's IDispatcher abstraction is in place; TEST-01 through TEST-03 can now be written (dependency correctly resolved).
 
 ## Deferred Items
 
@@ -83,6 +88,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-16T19:55:06.273Z
-Stopped at: context exhaustion at 76% (2026-05-16)
+Last session: 2026-05-17
+Stopped at: Phase 3 planning complete
 Resume file: None
